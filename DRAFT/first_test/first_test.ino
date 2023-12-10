@@ -1,4 +1,4 @@
-#include <AFMotor.h> // Include Adafruit Motor shield library
+//#include <AFMotor.h> // Include Adafruit Motor shield library
 
 AF_DCMotor dcMotor(4); // DC motor on M4
 AF_Stepper stepperMotor(200, 2); // Stepper motor (200 steps, motor port #2)

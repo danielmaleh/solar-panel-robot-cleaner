@@ -1,5 +1,3 @@
-#include <ACS712.h>
-
 const int currentPin = A1; // Brush motor pins (IN1, IN2)
 const int currentSensitivity = 66; 
 double currentVal = 0;

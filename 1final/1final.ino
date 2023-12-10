@@ -13,6 +13,8 @@ float rain_detector_freq = 1/300; // Frequency of the rain detector
 float button_freq = 1/100; // Frequency of the button
 float led_freq = 1/100; // Frequency of the LED
 float ir_freq = 1; // Frequency of the IR sensor
+// Add delay for wheel to go down.
+// Add constants or variables: buttonStateC1, buttonStateC2, isRaining, irValue, buttonPin1 etc.
 
 // Pin Definitions
 const int irSensorPin = A1; // IR sensor on analog pin A0
