@@ -26,10 +26,12 @@ AccelStepper our_stepper = AccelStepper(MotorInterfaceType, motorPin7, motorPin8
 //Current sensors (x3) Pins 
 const int currentPin1 = A1; 
 const int currentPin2 = A2;
-const int currentPin3 = A3;
-float currentVal1 = 0;
-float currentVal2 = 0;
-float currentVal3 = 0;
+//two current sensors for the stepper 
+//const int currentPin3 = A3;
+//const int currentPin4 = A0;
+//float currentVal1 = 0;
+//float currentVal2 = 0;
+//float currentVal3 = 0;
 const float currentSensitivity = 0.185; 
 
 //End switch buttons (x3) Pins
@@ -64,7 +66,7 @@ void setup() {
   //Set current pins as inputs
   pinMode(currentPin1, INPUT);
   pinMode(currentPin2, INPUT);
-  pinMode(currentPin3, INPUT);
+  //pinMode(currentPin3, INPUT);
 
   Serial.begin(9600);
 }
@@ -92,13 +94,15 @@ void loop() {
   our_stepper.runSpeed();
   our_stepper.setCurrentPosition(0);
   delay(1000); 
-  while (lastButtonVal3 == 0) {
+  while (lastButtonVal3 != 0) {
     digitalWrite(motorPin1, LOW);
     digitalWrite(motorPin2, HIGH);
     analogWrite(motorPin3, motorSpeed1);
     digitalWrite(motorPin4, LOW);
     digitalWrite(motorPin5, HIGH);
     analogWrite(motorPin6, motorSpeed2);
+    check_current(currentPin1); 
+    check_current(currentPin2); 
     check_switches(); 
   }
   digitalWrite(motorPin1, LOW);
@@ -110,19 +114,18 @@ void loop() {
     digitalWrite(motorPin1, HIGH);
     digitalWrite(motorPin2, LOW);
     analogWrite(motorPin3, motorSpeed1);
+    check_current(currentPin1); 
     check_switches(); 
   }
   digitalWrite(motorPin1, LOW);
   digitalWrite(motorPin2, LOW);
-  delay(1000); 
-  // Getting a current value from current sensor
-  currentVal1 = analogRead(currentPin1);
-  currentVal1 = (2.5-(currentVal1*(5.0/1024.0)))/currentSensitivity;
-  Serial.print("current Value1: "); 
-  Serial.print(currentVal1, 5);
-  Serial.println(" [A]");
-
-  delay(3000); // Short delay for debounce and sensor stability 
+  delay(1000);  
+  while (lastButtonVal1 != 0) {
+    our_stepper.setSpeed(200);
+    our_stepper.runSpeed();
+  }
+  our_stepper.setSpeed(0);
+  our_stepper.runSpeed();
 }
 
 void check_switches() {
@@ -153,4 +156,12 @@ void check_switches() {
       lastButtonVal3 = currentButtonVal3; 
     }
   }
+}
+
+void check_current(int currentPin) {
+  float currentVal = analogRead(currentPin);
+  currentVal = (2.5-(currentVal*(5.0/1024.0)))/currentSensitivity;
+  Serial.print("current Value: "); 
+  Serial.print(currentVal, 5);
+  Serial.println("[A]");
 }
