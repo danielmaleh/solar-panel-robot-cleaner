@@ -74,7 +74,7 @@ void loop() {
   // Command of a DC motor with PWM
   digitalWrite(motorPin1, LOW);
   digitalWrite(motorPin2, HIGH);
-  analogWrite(motorPin3, motorSpeed);
+  analogWrite(motorPin3, motorSpeed1);
 
   //Stepper motor control
   our_stepper.step(steps_per_rev);
