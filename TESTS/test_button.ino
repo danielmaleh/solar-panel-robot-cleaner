@@ -1,5 +1,3 @@
-#include <Arduino.h>
-
 const int ButtonPin = A2; // Button connected to pin A2
 const int debounceDelay = 50; // Debounce delay in milliseconds
 

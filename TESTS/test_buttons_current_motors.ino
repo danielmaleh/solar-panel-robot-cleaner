@@ -1,87 +1,107 @@
-// Define pin connections & motor speed
-const int motorPin1 = 9; // Motor connected to digital pin 9
-const int motorPin2 = 10; // Motor connected to digital pin 10
-const int motorPin3 = 11; // Motor connected to digital pin 11
-const int motorSpeed = 200; // Adjust motor speed (0-255)
+#include <Stepper.h>
+//Motor driver pins
+//Driver 1 : brush DC motor & gearbox DC motor + PWM, jumpers removed for PWM
+//Gearbox motor
+const int motorPin1 = 22; 
+const int motorPin2 = 23; 
+const int motorPin3 = 8; 
+const int motorSpeed1 = 255; // (0-255)
+//Brush motor
+const int motorPin4 = 24; 
+const int motorPin5 = 25; 
+const int motorPin6 = 9; 
+const int motorSpeed2 = 178; // 9V max for brush motor 
 
-const int currentPin = A8; // Brush motor pins (IN1, IN2)
+//Driver 2 : Stepper motor, jumpers kept in place 
+const int motorPin7 = 26; 
+const int motorPin8 = 27; 
+const int motorPin9 = 28; 
+const int motorPin10 = 29; 
+const int steps_per_rev = 200;
+Stepper our_stepper(steps_per_rev, motorPin7, motorPin8, motorPin9, motorPin10);
+
+//Current sensors (x3) Pins 
+const int currentPin1 = A1; 
+const int currentPin2 = A2;
+const int currentPin3 = A3;
+float currentVal1 = 0;
+float currentVal2 = 0;
+float currentVal3 = 0;
 const float currentSensitivity = 0.185; 
-float currentVal = 0;
 
-const int ButtonPin = A2; // Button connected to pin A2
+//End switch buttons (x3) Pins
+const int ButtonPin1 = A4; 
+const int ButtonPin2= A5; 
+const int ButtonPin3 = A6; 
+float lastButtonVal1 = 0;
+float lastButtonVal2 = 0;
+float lastButtonVal3 = 0;
 const int debounceDelay = 50; // Debounce delay in milliseconds
-
-float lastButtonVal = 0;
 unsigned long lastDebounceTime = 0; // Timestamp to store last debounce time
 
 void setup() {
-  pinMode(motorPin1, OUTPUT); // Set motor pin as output
-  pinMode(motorPin2, OUTPUT); // Set motor pin as output
-  pinMode(motorPin3, OUTPUT); // Set motor pin as output
+  //Set motor pins as outputs
+  //Gearbox
+  pinMode(motorPin1, OUTPUT); 
+  pinMode(motorPin2, OUTPUT); 
+  pinMode(motorPin3, OUTPUT); 
+  //Brush
+  pinMode(motorPin4, OUTPUT); 
+  pinMode(motorPin5, OUTPUT); 
+  pinMode(motorPin6, OUTPUT); 
+  //Stepper
+  our_stepper.setSpeed(60); //Rev per min 
+  //Set button pins as inputs
+  pinMode(ButtonPin1, INPUT);
+  pinMode(ButtonPin2, INPUT);
+  pinMode(ButtonPin3, INPUT);
+  //Set current pins as inputs
+  pinMode(currentPin1, INPUT);
+  pinMode(currentPin2, INPUT);
+  pinMode(currentPin3, INPUT);
 
-  pinMode(ButtonPin, INPUT);
-
-  pinMode(currentPin, INPUT);
   Serial.begin(9600);
 }
 
 void loop() {
 
+  //Idea of this test loop : 
+  //1) Set stepper motor for a certain time left
+  //2) Set gearbox motor down  and brush motor on until bistable switch on 
+  //3) Set gearbox motor up until chariot switch on 
+  //4) Set stepper motor rigth until end course switch on 
+
+  // Command of a DC motor with PWM
   digitalWrite(motorPin1, LOW);
   digitalWrite(motorPin2, HIGH);
   analogWrite(motorPin3, motorSpeed);
 
-  // We have the valeue in volts, offset of 0.5
-  currentVal = analogRead(currentPin);
-  // currentVal = (currentVal/1024.0);
-  // currentVal = currentVal - 0.5;
-  // currentVal = currentVal/currentSensitivity;
-  currentVal = (2.5-(currentVal*(5.0/1024.0)))/currentSensitivity;
+  //Stepper motor control
+  our_stepper.step(steps_per_rev);
+  delay(500);
+  our_stepper.step(-steps_per_rev);
+  delay(500);
+
+  // Getting a current value from current sensor
+  currentVal1 = analogRead(currentPin1);
+  currentVal1 = (2.5-(currentVal1*(5.0/1024.0)))/currentSensitivity;
   Serial.print("current Value1: "); 
-  Serial.print(currentVal, 5);
+  Serial.print(currentVal1, 5);
   Serial.println(" [A]");
 
   delay(3000); // Short delay for debounce and sensor stability
 
-  digitalWrite(motorPin1, HIGH);
-  digitalWrite(motorPin2, LOW);
-  analogWrite(motorPin3, motorSpeed);
-
-  // We have the valeue in volts, offset of 0.5
-  currentVal = analogRead(currentPin);
-  // currentVal = (currentVal/1024.0);
-  // currentVal -= 0.5;
-  // currentVal = currentVal/currentSensitivity;
-  currentVal = (2.5-(currentVal*(5.0/1024.0)))/currentSensitivity;
-  Serial.print("current Value2: "); 
-  Serial.print(currentVal);
-  Serial.println(" [A]");
-
-  delay(3000); // Short delay for debounce and sensor stability
-
-}
-
-void loop() {
-  float currentButtonVal = analogRead(ButtonPin);
-
-  // Check if button state has changed
-  if (currentButtonVal != lastButtonVal) {
-    // Reset the debouncing timer
+  // Reading an end switch state 
+  float currentButtonVal = analogRead(ButtonPin1);
+  if (currentButtonVal != lastButtonVal1) {
     lastDebounceTime = millis();
   }
-
   if ((millis() - lastDebounceTime) > debounceDelay) {
-    // If the button state has not changed for a period longer than the debounce delay, consider the reading stable
-    if (currentButtonVal != lastButtonVal) {
-      lastButtonVal = currentButtonVal;
-
-      // Print the stable button value
+    if (currentButtonVal != lastButtonVal1) {
+      lastButtonVal1 = currentButtonVal;
       Serial.print("Button value: "); 
-      Serial.println(lastButtonVal, 5);
-      // released = 1023 and pressed = 0.
+      Serial.println(lastButtonVal1, 5); // released = 1023 and pressed = 0
     }
   }
-
-  delay(100); // Short delay for sensor stability
+  delay(100); 
 }
-

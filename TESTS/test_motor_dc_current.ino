@@ -3,6 +3,8 @@ const int motorPin1 = 9; // Motor connected to digital pin 9
 const int motorPin2 = 10; // Motor connected to digital pin 10
 const int motorPin3 = 11; // Motor connected to digital pin 11
 const int motorSpeed = 200; // Adjust motor speed (0-255)
+// PWM pin 
+// 178,179 for 9V PWM 
 
 const int currentPin = A8; // Brush motor pins (IN1, IN2)
 const float currentSensitivity = 0.185; 
