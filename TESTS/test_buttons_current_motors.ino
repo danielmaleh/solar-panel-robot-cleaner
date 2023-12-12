@@ -40,7 +40,9 @@ float lastButtonVal1 = 0;
 float lastButtonVal2 = 0;
 float lastButtonVal3 = 0;
 const int debounceDelay = 50; // Debounce delay in milliseconds
-unsigned long lastDebounceTime = 0; // Timestamp to store last debounce time
+unsigned long lastDebounceTime1 = 0; // Timestamp to store last debounce time
+unsigned long lastDebounceTime2 = 0;
+unsigned long lastDebounceTime3 = 0;
 
 void setup() {
   //Set motor pins as outputs
@@ -87,13 +89,32 @@ void loop() {
     our_stepper.runSpeed();
   }
   our_stepper.setSpeed(0); 
+  our_stepper.runSpeed();
   our_stepper.setCurrentPosition(0);
-
-  // Command of a DC motor with PWM
+  delay(1000); 
+  while (lastButtonVal3 == 0) {
+    digitalWrite(motorPin1, LOW);
+    digitalWrite(motorPin2, HIGH);
+    analogWrite(motorPin3, motorSpeed1);
+    digitalWrite(motorPin4, LOW);
+    digitalWrite(motorPin5, HIGH);
+    analogWrite(motorPin6, motorSpeed2);
+    check_switches(); 
+  }
   digitalWrite(motorPin1, LOW);
-  digitalWrite(motorPin2, HIGH);
-  analogWrite(motorPin3, motorSpeed1);
-
+  digitalWrite(motorPin2, LOW);
+  digitalWrite(motorPin4, LOW);
+  digitalWrite(motorPin5, LOW);
+  delay(1000); 
+  while (lastButtonVal2 != 0) {
+    digitalWrite(motorPin1, HIGH);
+    digitalWrite(motorPin2, LOW);
+    analogWrite(motorPin3, motorSpeed1);
+    check_switches(); 
+  }
+  digitalWrite(motorPin1, LOW);
+  digitalWrite(motorPin2, LOW);
+  delay(1000); 
   // Getting a current value from current sensor
   currentVal1 = analogRead(currentPin1);
   currentVal1 = (2.5-(currentVal1*(5.0/1024.0)))/currentSensitivity;
@@ -108,16 +129,28 @@ void check_switches() {
   float currentButtonVal1 = analogRead(ButtonPin1);
   float currentButtonVal2 = analogRead(ButtonPin2);
   float currentButtonVal3 = analogRead(ButtonPin3);
-  lastDebounceTime = millis();
-  if ((millis() - lastDebounceTime) > debounceDelay) {
+  if (currentButtonVal1 != lastButtonVal1) {
+    lastDebounceTime1 = millis();
+  }
+  if (currentButtonVal2 != lastButtonVal2) {
+    lastDebounceTime2 = millis();
+  }
+  if (currentButtonVal3 != lastButtonVal3) {
+    lastDebounceTime3 = millis();
+  }
+  if ((millis() - lastDebounceTime1) > debounceDelay) {
     if (currentButtonVal1 != lastButtonVal1) {
       lastButtonVal1 = currentButtonVal1; // released = 1023 and pressed = 0
     }
+  }
+  if ((millis() - lastDebounceTime2) > debounceDelay) {
     if (currentButtonVal2 != lastButtonVal2) {
-      lastButtonVal1 = currentButtonVal2; // released = 1023 and pressed = 0
+      lastButtonVal2 = currentButtonVal2; 
     }
+  }
+  if ((millis() - lastDebounceTime3) > debounceDelay) {
     if (currentButtonVal3 != lastButtonVal3) {
-      lastButtonVal1 = currentButtonVal3; // released = 1023 and pressed = 0
+      lastButtonVal3 = currentButtonVal3; 
     }
   }
 }
