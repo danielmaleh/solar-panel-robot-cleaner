@@ -15,6 +15,7 @@ const int motorPin6 = 9;
 const int motorSpeed2 = 178; // 9V max for brush motor 
 
 //Driver 2 : Stepper motor, jumpers kept in place 
+// Faire gaffe sens des steps 
 const int motorPin7 = 26; 
 const int motorPin8 = 27; 
 const int motorPin9 = 28; 
@@ -53,6 +54,7 @@ void setup() {
   pinMode(motorPin2, OUTPUT); 
   pinMode(motorPin3, OUTPUT); 
   //Brush
+  // Faire attention côté du driver 
   pinMode(motorPin4, OUTPUT); 
   pinMode(motorPin5, OUTPUT); 
   pinMode(motorPin6, OUTPUT); 
@@ -94,6 +96,7 @@ void loop() {
   our_stepper.runSpeed();
   our_stepper.setCurrentPosition(0);
   delay(1000); 
+  check_switches(); 
   while (lastButtonVal3 != 0) {
     digitalWrite(motorPin1, LOW);
     digitalWrite(motorPin2, HIGH);
