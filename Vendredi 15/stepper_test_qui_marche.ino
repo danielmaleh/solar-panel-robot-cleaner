@@ -1,3 +1,5 @@
+//20cm en 5 rev = 4 cm par rev. 
+
 // Define stepper motor connections and steps per revolution:
 #define dirPin 2
 #define stepPin 3

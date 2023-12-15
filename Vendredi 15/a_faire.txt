@@ -1,0 +1,6 @@
+--> Etalonner le stepper 
+--> mettre les capteurs de courant pour le stepper (x2) et pour le gearbox motor (x1) 
+--> Faire les branchements propres sur la vraie plaquette 
+--> Mettre en forme le code final 
+--> Refaire pseudo-code + schéma élec avec Méga 
+--> Définir les pins 

@@ -6,6 +6,10 @@
 // LED
 const int ledred = 8; 
 const int ledgreen = 9; 
+const int ledblue = 11; 
+
+// IR sensor
+const int irSensorPin = A3; 
 
 // DC Brush motor pin definition 
 const int motorPin1 = 7; 
@@ -52,21 +56,30 @@ void setup() {
 
 void loop() {
 
+  float irValue = analogRead(irSensorPin);
+  Serial.println("IR Sensor Value = ");
+  Serial.println(irValue);
+
   digitalWrite(dirPin, HIGH);
 
   // Spin the stepper motor 5 revolutions fast:
   for (int i = 0; i < 5 * stepsPerRevolution; i++) {
+    setColor(255, 0, 0);
     digitalWrite(stepPin, HIGH);
     delayMicroseconds(500);// shorter delay = higher speed 
     digitalWrite(stepPin, LOW);
     delayMicroseconds(500);
   }
+  setColor(0, 0, 0);
   digitalWrite(stepPin, LOW);
+
+  Serial.println("IR Sensor Value = ");
+  Serial.println(irValue);
 
   float switch_val = analogRead(ButtonPin1);
 
   while (switch_val != 0) {
-    digitalWrite(ledred, HIGH);
+    setColor(0, 255, 0);
     digitalWrite(motorPin1, LOW);
     digitalWrite(motorPin2, HIGH);
     analogWrite(motorPin3, motorSpeed1);
@@ -75,34 +88,48 @@ void loop() {
     analogWrite(motorPin6, motorSpeed2);
     switch_val = analogRead(ButtonPin1);
   }
+  setColor(0, 0, 0);
   digitalWrite(motorPin1, LOW);
   digitalWrite(motorPin2, LOW);
   digitalWrite(motorPin4, LOW);
   digitalWrite(motorPin5, LOW);
-  digitalWrite(ledred, LOW);
+
+  Serial.println("IR Sensor Value = ");
+  Serial.println(irValue);
   
   switch_val = analogRead(ButtonPin2);
 
   while (switch_val != 0) {
+    setColor(0, 0, 255);
     digitalWrite(motorPin4, HIGH);
     digitalWrite(motorPin5, LOW);
     analogWrite(motorPin6, motorSpeed2);
     switch_val = analogRead(ButtonPin2);
   }
+  setColor(0, 0, 0);
   digitalWrite(motorPin4, LOW);
   digitalWrite(motorPin5, LOW);
+
+  Serial.println("IR Sensor Value = ");
+  Serial.println(irValue);
 
   // Set the spinning direction counterclockwise:
   digitalWrite(dirPin, LOW);
   switch_val = analogRead(ButtonPin3);
   while (switch_val != 0) {
-    digitalWrite(ledgreen, HIGH);
+    setColor(255, 0, 0);
     digitalWrite(stepPin, HIGH);
     delayMicroseconds(500);
     digitalWrite(stepPin, LOW);
     delayMicroseconds(500);
     switch_val = analogRead(ButtonPin3);
   }
+  setColor(0, 0, 0);
   digitalWrite(stepPin, LOW);
-  digitalWrite(ledgreen, LOW);
+}
+
+void setColor(int red, int green, int blue) {
+  analogWrite(ledred, red);
+  analogWrite(ledgreen, green);
+  analogWrite(ledblue, blue); 
 }
