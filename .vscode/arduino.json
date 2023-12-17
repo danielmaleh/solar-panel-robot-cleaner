@@ -1,7 +1,6 @@
 {
-    "configuration": "cpu=atmega2560",
-    "board": "arduino:avr:mega",
+    "board": "arduino:avr:uno",
     "programmer": "avrispmkii",
-    "port": "COM6",
-    "sketch": "test_buttons_current_motors.ino"
+    "port": "COM5",
+    "sketch": "FINAL\\servo_rain_button.ino"
 }

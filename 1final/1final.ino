@@ -5,13 +5,13 @@ const int cleaning_width = 30; // Define the effective cleaning width in cm
 const unsigned long cleaning_period = 0; // Define the time between two cleanings in milliseconds
 const int dist = 0; // Define the total width of all panels
 
-float stepper_freq = 1/100; // Frequency of the stepper motor
-float dc_brush_freq = 1/100; // Frequency of the brush motor
-float dc_motor_freq = 1/100; // Frequency of the DC motor
-float valve_freq = 1/1000; // Frequency of the valve
-float rain_detector_freq = 1/300; // Frequency of the rain detector
-float button_freq = 1/100; // Frequency of the button
-float led_freq = 1/100; // Frequency of the LED
+float stepper_freq = 100; // Frequency of the stepper motor
+float dc_brush_freq = 100; // Frequency of the brush motor
+float dc_motor_freq = 100; // Frequency of the DC motor
+float valve_freq = 1000; // Frequency of the valve
+float rain_detector_freq = 300; // Frequency of the rain detector
+float button_freq = 100; // Frequency of the button
+float led_freq = 100; // Frequency of the LED
 float ir_freq = 1; // Frequency of the IR sensor
 // Add delay for wheel to go down.
 // Add constants or variables: buttonStateC1, buttonStateC2, isRaining, irValue, buttonPin1 etc.

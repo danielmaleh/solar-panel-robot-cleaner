@@ -1,0 +1,16 @@
+// TO DO
+// Add delay for wheel to go down.
+// Add constants or variables: buttonStateC1, buttonStateC2, isRaining, irValue, buttonPin1 etc.
+// change frequency to time
+// Check servo code
+// Remove prints or add them for control and debugging
+// Fix thresholds
+// definr eiither check or force a button state at initialization or resst position.
+// change the brush motor function to have only one direction.
+// implement nb of cycles and counter etc..
+// --> GRADE rain sensor
+// --> mettre les capteurs de courant pour le stepper (x2) et pour le gearbox motor (x1) 
+// --> Faire les branchements propres sur la vraie plaquette 
+// --> Mettre en forme le code final 
+// --> Refaire pseudo-code + schéma élec avec Méga 
+// --> Définir les pins 

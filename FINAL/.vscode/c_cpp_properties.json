@@ -40,6 +40,7 @@
                 "c:\\users\\daniel elmaleh\\appdata\\local\\arduino15\\packages\\arduino\\tools\\avr-gcc\\7.3.0-atmel3.6.1-arduino7\\avr\\include",
                 "C:\\Users\\Daniel Elmaleh\\Documents\\Arduino\\libraries",
                 "C:\\Users\\Daniel Elmaleh\\Documents\\Arduino\\libraries\\AccelStepper",
+                "C:\\Users\\Daniel Elmaleh\\Documents\\Arduino\\libraries\\Servo\\src",
                 "${workspaceFolder}/libraries/Servo/src",
                 "${workspaceFolder}/libraries/AccelStepper/src",
                 "${workspaceFolder}/libraries/Stepper/src",
