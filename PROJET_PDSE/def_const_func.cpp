@@ -13,6 +13,7 @@ bool raining = false; // Boolean indicating if it is raining
 bool IRseen = false; // Value of the IR sensor
 unsigned long currentTime; // Actual time
 unsigned long cleaningTime; // Time of the last cleaning
+int stepperStartSpeed = 1000, stepperEndSpeed = 700, stepperAccelerationSteps = 300;
 const float IR_PERIODE = 1.0; // Periode in milliseconds
 const float RAIN_SENSOR_PERIODE = 1000.0; // Periode in milliseconds
 const int MOTOR_SPEED_BRUSH = 178; // Brush motor speed
@@ -124,15 +125,15 @@ void controlGearboxMotor(bool direction, int speed) {
 
 }
 //------------------------------------STEPPER------------------------------------
-void controlStepper(int distance, bool clockwise, int startSpeed, int endSpeed, int accelerationSteps) {
+void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int stepperEndSpeed, int stepperAccelerationSteps) {
     digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
 
     int totalSteps = distance / CM_PER_REVOLUTION * STEPPER_STEPS_PER_REVOLUTION;
-    int stepDelay = startSpeed;
-    int stepChange = (startSpeed - endSpeed) / accelerationSteps;
+    int stepDelay = stepperStartSpeed;
+    int stepChange = (stepperStartSpeed - stepperEndSpeed) / stepperAccelerationSteps;
 
     // Accelerate
-    for (int i = 0; i < accelerationSteps && i < totalSteps; i++) {
+    for (int i = 0; i < stepperAccelerationSteps && i < totalSteps; i++) {
         digitalWrite(STEPPER_STEP_PIN, HIGH);
         delayMicroseconds(stepDelay);
         digitalWrite(STEPPER_STEP_PIN, LOW);
@@ -141,15 +142,15 @@ void controlStepper(int distance, bool clockwise, int startSpeed, int endSpeed, 
     }
 
     // Constant speed
-    for (int i = accelerationSteps; i < totalSteps - accelerationSteps; i++) {
+    for (int i = stepperAccelerationSteps; i < totalSteps - stepperAccelerationSteps; i++) {
         digitalWrite(STEPPER_STEP_PIN, HIGH);
-        delayMicroseconds(endSpeed);
+        delayMicroseconds(stepperEndSpeed);
         digitalWrite(STEPPER_STEP_PIN, LOW);
-        delayMicroseconds(endSpeed);
+        delayMicroseconds(stepperEndSpeed);
     }
 
     // Decelerate
-    for (int i = totalSteps - accelerationSteps; i < totalSteps; i++) {
+    for (int i = totalSteps - stepperAccelerationSteps; i < totalSteps; i++) {
         digitalWrite(STEPPER_STEP_PIN, HIGH);
         delayMicroseconds(stepDelay);
         digitalWrite(STEPPER_STEP_PIN, LOW);
@@ -239,9 +240,23 @@ void checkCurrent(int currentPin) {
         Serial.print("Current Value: ");
         Serial.print(currentVal, 5);
         Serial.println(" [A]");
-        if(currentVal >= CURRENT_THRESHOLD) {
-            Serial.println("Current threshold exceeded");
-            currentState = PROBLEM;
+        if (currentPin == CURRENT_PIN1)
+        {
+            if (currentVal >= CURRENT_THRESHOLD_GEARBOX) {
+                Serial.println("Current threshold exceeded gearbox");
+                currentState = PROBLEM;
+            }
+        }
+        else if (currentPin == CURRENT_PIN2)
+        {
+            if (currentVal >= CURRENT_THRESHOLD_BRUSH) {
+                Serial.println("Current threshold exceeded brush");
+                currentState = PROBLEM;
+            }
+        }
+        else
+        {
+            Serial.println("Error: Current pin not defined");
         }
         last_time = millis();
     }
@@ -335,10 +350,10 @@ void moveMotor(MotorDirection direction, float distanceOrSpeed) {
                 controlGearboxMotor(false, distanceOrSpeed); // Fixed speed
                 break;
             case LEFT:
-                controlStepper(distanceOrSpeed, false); // Assuming false is left
+                controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
                 break;
             case RIGHT:
-                controlStepper(distanceOrSpeed, true); // Assuming true is right
+                controlStepper(distanceOrSpeed, true, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming true is right
                 break;
         }
         last_time = millis();
