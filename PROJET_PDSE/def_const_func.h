@@ -42,7 +42,7 @@ enum MotorDirection {
 // 460,470 = at 10cm
 // >600 = < 5cm. Si trop proche la valeur rebaisse.
 
-#define IR_THRESHOLD 500 
+#define IR_THRESHOLD 500 // TO DEFINED
 #define IR_SENSOR_PIN A4 
 
 extern const float IR_PERIODE;
@@ -50,7 +50,7 @@ extern bool IRseen;
 
 
 //------------------------------------RAIN------------------------------------
-#define RAIN_THRESHOLD 700 
+#define RAIN_THRESHOLD 700 // DEFINED
 #define RAIN_SENSOR_PIN A0 
 
 // Frequency of the rain detector
@@ -58,17 +58,17 @@ extern const float RAIN_SENSOR_PERIODE;
 
 
 //------------------------------------DC_BRUSH------------------------------------
-#define BRUSH_MOTOR_PIN1 24
-#define BRUSH_MOTOR_PIN2 25
-#define BRUSH_MOTOR_SPEED_PIN 9
+#define BRUSH_MOTOR_PIN1 6
+#define BRUSH_MOTOR_PIN2 7
+#define BRUSH_MOTOR_SPEED_PIN 10
 
 extern const int MOTOR_SPEED_BRUSH;
 
 
 //------------------------------------DC_GEAR------------------------------------
-#define GEARBOX_MOTOR_PIN1 22
-#define GEARBOX_MOTOR_PIN2 23
-#define GEARBOX_MOTOR_SPEED_PIN 8
+#define GEARBOX_MOTOR_PIN1 4
+#define GEARBOX_MOTOR_PIN2 5
+#define GEARBOX_MOTOR_SPEED_PIN 12
 
 extern const int MOTOR_SPEED_GEAR;
 extern const float MOTOR_PERIODE;
@@ -82,6 +82,7 @@ extern const float MOTOR_PERIODE;
 
 #define STEPPER_DIR_PIN 2
 #define STEPPER_STEP_PIN 3
+extern int stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps;
 
 
 //------------------------------------LEDs------------------------------------
@@ -94,10 +95,11 @@ extern const float LED_PERIODE;
 
 
 //------------------------------------CURRENT------------------------------------
-#define CURRENT_SENSITIVITY 0.185
-#define CURRENT_THRESHOLD 0.5
-#define CURRENT_PIN1 A0 // current sensor for brush motor
-#define CURRENT_PIN2 A1 // current sensor for gearbox motor
+#define CURRENT_SENSITIVITY 0.185 // DEFINED
+#define CURRENT_THRESHOLD_GEARBOX 1.5 // DEFINED
+#define CURRENT_THRESHOLD_BRUSH 0.5 // TO DEFINE
+#define CURRENT_PIN1 A0 // current sensor for gearbox motor
+#define CURRENT_PIN2 A1 // current sensor for brush motor
 
 extern const float CURRENT_PERIODE;
 
@@ -150,7 +152,7 @@ void controlBrushMotor(bool direction, int speed);
 void controlGearboxMotor(bool direction, int speed);
 
 //------------------------------------STEPPER------------------------------------
-void controlStepper(int revolutions, bool clockwise);
+void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int stepperEndSpeed, int stepperAccelerationSteps);
 
 //------------------------------------LEDs------------------------------------
 void updateLEDs(State currentState);

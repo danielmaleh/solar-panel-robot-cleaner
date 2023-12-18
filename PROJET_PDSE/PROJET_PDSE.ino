@@ -20,8 +20,6 @@ void loop() {
     updateLEDs(currentState);
     checkCurrent(CURRENT_PIN1);
     checkCurrent(CURRENT_PIN2);
-    checkCurrent(CURRENT_PIN3);
-    checkCurrent(CURRENT_PIN4);
     checkButtonR();
     checkButtonC1();
     checkButtonC2();
