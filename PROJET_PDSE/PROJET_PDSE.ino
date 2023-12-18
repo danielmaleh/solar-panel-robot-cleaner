@@ -68,7 +68,8 @@ void loop() {
         case INITIAL_POSITION:
             // Logic to move to the initial position
             // steps to 1st position and when finished state = CLEANING
-            controlStepper(LEFT, DIST_TO_INITIAL_POSITION);
+            moveMotor(LEFT, DIST_TO_INITIAL_POSITION);
+            stopAllMotors();
             currentState = CLEANING;
         break;
         case CLEANING:
@@ -77,6 +78,7 @@ void loop() {
             // Else go downward with dc motor and activate dc brush motor and valve (until buttonR=1).
             if (buttonStateR == 1) {
                 delay(END_OF_CLEANING_DELAY);
+                stopAllMotors();
                 currentState = UP_TRAVEL;
             }
             else {
@@ -96,8 +98,15 @@ void loop() {
             else if (IRseen == false) {
                 moveMotor(UP, MOTOR_SPEED_GEAR);
             }
-            //IF nb cycles = N etc...
-            currentState = TRANSLATION;
+            else {
+                stopAllMotors();
+                nb_cycles_counter = nb_cycles_counter + 1;
+                if (nb_cycles_counter*step == DIST) {
+                    currentState = RETURN_HOME;
+                    break;
+                }
+                currentState = TRANSLATION;
+            }
         break;
         case TRANSLATION:
             // Logic to translate to the next position
@@ -111,6 +120,7 @@ void loop() {
                 moveMotor(UP, MOTOR_SPEED_GEAR);
             }
             else {
+                stopAllMotors();
                 currentState = CLEANING;
             }
         break;
@@ -128,6 +138,7 @@ void loop() {
                 moveMotor(RIGHT, step);
             }
             else {
+                stopAllMotors();
                 currentState = REST;
             }
         break;

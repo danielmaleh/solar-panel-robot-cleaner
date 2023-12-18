@@ -8,6 +8,7 @@
 Servo myServo;  // Create a Servo object
 
 int step = DIST / CLEANING_WIDTH + (DIST % CLEANING_WIDTH != 0); // In cm
+int nb_cycles_counter = 0;
 bool raining = false; // Boolean indicating if it is raining
 bool IRseen = false; // Value of the IR sensor
 unsigned long currentTime; // Actual time
@@ -19,7 +20,7 @@ const int MOTOR_SPEED_GEAR = 255; // Gearbox motor speed
 const float MOTOR_PERIODE = 100.0; // Periode in milliseconds
 const float LED_PERIODE = 100.0; // Periode in milliseconds
 const float CURRENT_PERIODE = 100.0; // Periode in milliseconds
-const float BUTTON_PERIODE = 100.0; // Periode in milliseconds
+const float BUTTON_PERIODE = 30.0; // Periode in milliseconds
 const float VALVE_PERIODE = 1000.0; // Periode in milliseconds
 bool buttonStateR = HIGH, buttonStateC1 = HIGH, buttonStateC2 = HIGH; // Current state of buttons. state is true when not pressed.
 
@@ -72,8 +73,6 @@ void initializeStepperMotor() {
 void initializeCurrentSensors() {
     pinMode(CURRENT_PIN1, INPUT);
     pinMode(CURRENT_PIN2, INPUT);
-    pinMode(CURRENT_PIN3, INPUT);
-    pinMode(CURRENT_PIN4, INPUT);
 }
 
 void initializeSerialCommunication() {
@@ -125,16 +124,37 @@ void controlGearboxMotor(bool direction, int speed) {
 
 }
 //------------------------------------STEPPER------------------------------------
-void controlStepper(int distance, bool clockwise) {
+void controlStepper(int distance, bool clockwise, int startSpeed, int endSpeed, int accelerationSteps) {
     digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
 
-    int revolutions = distance / CM_PER_REVOLUTION;
+    int totalSteps = distance / CM_PER_REVOLUTION * STEPPER_STEPS_PER_REVOLUTION;
+    int stepDelay = startSpeed;
+    int stepChange = (startSpeed - endSpeed) / accelerationSteps;
 
-    for (int i = 0; i < revolutions * STEPPER_STEPS_PER_REVOLUTION; i++) {
+    // Accelerate
+    for (int i = 0; i < accelerationSteps && i < totalSteps; i++) {
         digitalWrite(STEPPER_STEP_PIN, HIGH);
-        delayMicroseconds(500);
+        delayMicroseconds(stepDelay);
         digitalWrite(STEPPER_STEP_PIN, LOW);
-        delayMicroseconds(500);
+        delayMicroseconds(stepDelay);
+        stepDelay -= stepChange;
+    }
+
+    // Constant speed
+    for (int i = accelerationSteps; i < totalSteps - accelerationSteps; i++) {
+        digitalWrite(STEPPER_STEP_PIN, HIGH);
+        delayMicroseconds(endSpeed);
+        digitalWrite(STEPPER_STEP_PIN, LOW);
+        delayMicroseconds(endSpeed);
+    }
+
+    // Decelerate
+    for (int i = totalSteps - accelerationSteps; i < totalSteps; i++) {
+        digitalWrite(STEPPER_STEP_PIN, HIGH);
+        delayMicroseconds(stepDelay);
+        digitalWrite(STEPPER_STEP_PIN, LOW);
+        delayMicroseconds(stepDelay);
+        stepDelay += stepChange;
     }
 }
 //------------------------------------LEDs------------------------------------

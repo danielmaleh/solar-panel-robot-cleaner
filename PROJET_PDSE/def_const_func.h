@@ -20,6 +20,7 @@
 
 // Global variables
 extern int step;
+extern int nb_cycles_counter; // Counter for the number of cycles
 extern bool raining; // Boolean indicating if it is raining
 extern unsigned long currentTime; // Actual time
 extern unsigned long cleaningTime; // Time of the last cleaning
@@ -97,9 +98,6 @@ extern const float LED_PERIODE;
 #define CURRENT_THRESHOLD 0.5
 #define CURRENT_PIN1 A0 // current sensor for brush motor
 #define CURRENT_PIN2 A1 // current sensor for gearbox motor
-#define CURRENT_PIN3 A3 // current sensor 1 for stepper motor
-#define CURRENT_PIN4 A4 // current sensor 2 for stepper motor
-
 
 extern const float CURRENT_PERIODE;
 

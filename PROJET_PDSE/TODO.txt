@@ -8,6 +8,7 @@
 // definr eiither check or force a button state at initialization or resst position.
 // change the brush motor function to have only one direction.
 // implement nb of cycles and counter etc..
+// Re-Grade the stepper motor's steps per rev.
 // --> GRADE rain sensor
 // --> mettre les capteurs de courant pour le stepper (x2) et pour le gearbox motor (x1) 
 // --> Faire les branchements propres sur la vraie plaquette 
