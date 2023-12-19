@@ -10,6 +10,8 @@
 // The states are: REST, WATER_FILLING, INITIAL_POSITION, FIRST_POSITION_CLEANING, CLEANING, UP_TRAVEL, TRANSLATION, RETURN_HOME, PROBLEM.
 // The main program is in the file 'main.ino'.
 
+#ifndef DEF_CONST_FUNC_H
+#define DEF_CONST_FUNC_H
 
 //------------------------------------GENERAL------------------------------------
 #define CLEANING_WIDTH 30 // Effective cleaning width in cm
@@ -51,7 +53,7 @@ extern bool IRseen;
 
 //------------------------------------RAIN------------------------------------
 #define RAIN_THRESHOLD 700 // DEFINED
-#define RAIN_SENSOR_PIN A0 
+#define RAIN_SENSOR_PIN A15  
 
 // Frequency of the rain detector
 extern const float RAIN_SENSOR_PERIODE;
@@ -88,8 +90,8 @@ extern int stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps;
 //------------------------------------LEDs------------------------------------
 #define LED_INTENSITY 150 
 #define RED_LED_PIN 11
-#define GREEN_LED_PIN 10
-#define BLUE_LED_PIN 9
+#define GREEN_LED_PIN 9
+#define BLUE_LED_PIN 8
 
 extern const float LED_PERIODE;
 
@@ -98,8 +100,8 @@ extern const float LED_PERIODE;
 #define CURRENT_SENSITIVITY 0.185 // DEFINED
 #define CURRENT_THRESHOLD_GEARBOX 1.5 // DEFINED
 #define CURRENT_THRESHOLD_BRUSH 0.5 // TO DEFINE
-#define CURRENT_PIN1 A0 // current sensor for gearbox motor
-#define CURRENT_PIN2 A1 // current sensor for brush motor
+#define CURRENT_PIN1 A14 // current sensor for gearbox motor
+#define CURRENT_PIN2 A0 // current sensor for brush motor
 
 extern const float CURRENT_PERIODE;
 
@@ -107,9 +109,9 @@ extern const float CURRENT_PERIODE;
 //------------------------------------BUTTONS------------------------------------
 #define DEBOUNCE_DELAY 50 // Debounce delay in milliseconds
 
-#define BUTTON_PIN_R A2 // End of travel button on robot
-#define BUTTON_PIN_C1 2 // End of travel button on carrige
-#define BUTTON_PIN_C2 3 // End of travel button on resting station
+#define BUTTON_PIN_R 22 // End of travel button on robot 3
+#define BUTTON_PIN_C1 24 // End of travel button on carrige 2
+#define BUTTON_PIN_C2 26 // End of travel button on resting station 1
 
 // Debouncing Variables
 extern unsigned long lastDebounceTimeR, lastDebounceTimeC1, lastDebounceTimeC2;
@@ -121,7 +123,7 @@ extern const float BUTTON_PERIODE;
 
 
 //------------------------------------VALVE (SERVO)------------------------------------
-#define SERVO_PIN 9 // Define the pin connected to the servo
+#define SERVO_PIN 13 // Define the pin connected to the servo
 #define VALVE_ANGLE 90 // Angle of the valve in degrees
 extern const float VALVE_PERIODE;
 
@@ -182,3 +184,5 @@ void moveMotor(MotorDirection direction, float distanceOrSpeed);
 
 //------------------------------------STOP ALL MOTORS------------------------------------
 void stopAllMotors();
+
+#endif // DEF_CONST_FUNC_H

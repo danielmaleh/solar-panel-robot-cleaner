@@ -1,6 +1,7 @@
 {
-    "board": "arduino:avr:uno",
+    "board": "arduino:avr:mega",
     "programmer": "avrispmkii",
     "port": "COM5",
-    "sketch": "PROJET_PDSE.ino"
+    "sketch": "PROJET_PDSE.ino",
+    "configuration": "cpu=atmega2560"
 }
