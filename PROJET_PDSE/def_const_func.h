@@ -15,10 +15,10 @@
 
 //------------------------------------GENERAL------------------------------------
 #define CLEANING_WIDTH 30 // Effective cleaning width in cm
-#define CLEANING_PERIOD 0 // Time between two cleanings in milliseconds
-#define DIST 0 // Total width of all panels
-#define DIST_TO_INITIAL_POSITION 0 // Distance to the initial position in cm
-#define END_OF_CLEANING_DELAY 0 // Delay after cleaning in milliseconds, for the wheel to get down
+#define CLEANING_PERIOD 1000*60 // Time between two cleanings in milliseconds
+#define DIST 107 // Total width of one panels in cm
+#define DIST_TO_INITIAL_POSITION 40 // Distance to the initial position in cm
+#define END_OF_CLEANING_DELAY 2000 // Delay after cleaning in milliseconds, for the wheel to get down
 
 // Global variables
 extern int step;
@@ -44,7 +44,7 @@ enum MotorDirection {
 // 460,470 = at 10cm
 // >600 = < 5cm. Si trop proche la valeur rebaisse.
 
-#define IR_THRESHOLD 500 // TO DEFINED
+#define IR_THRESHOLD 200 
 #define IR_SENSOR_PIN A4 
 
 extern const float IR_PERIODE;
@@ -80,7 +80,7 @@ extern const float MOTOR_PERIODE;
 // GRADING:
 // 20cm in 5 rev. = 4 cm per rev.
 #define CM_PER_REVOLUTION 4.0 // 4 cm per revolution
-#define STEPPER_STEPS_PER_REVOLUTION 200 //remove
+#define STEPPER_STEPS_PER_REVOLUTION 200 //remove??
 
 #define STEPPER_DIR_PIN 2
 #define STEPPER_STEP_PIN 3
@@ -99,7 +99,7 @@ extern const float LED_PERIODE;
 //------------------------------------CURRENT------------------------------------
 #define CURRENT_SENSITIVITY 0.185 // DEFINED
 #define CURRENT_THRESHOLD_GEARBOX 1.5 // DEFINED
-#define CURRENT_THRESHOLD_BRUSH 0.5 // TO DEFINE
+#define CURRENT_THRESHOLD_BRUSH 0.7 
 #define CURRENT_PIN1 A14 // current sensor for gearbox motor
 #define CURRENT_PIN2 A0 // current sensor for brush motor
 
