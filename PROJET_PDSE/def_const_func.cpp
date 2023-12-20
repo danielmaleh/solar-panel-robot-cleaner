@@ -16,11 +16,11 @@ unsigned long cleaningTime; // Time of the last cleaning
 int stepperStartSpeed = 1000, stepperEndSpeed = 700, stepperAccelerationSteps = 300;
 const float IR_PERIODE = 1.0; // Periode in milliseconds
 const float RAIN_SENSOR_PERIODE = 1000.0; // Periode in milliseconds
-const int MOTOR_SPEED_BRUSH = 178; // Brush motor speed
-const int MOTOR_SPEED_GEAR = 255; // Gearbox motor speed
+const int MOTOR_SPEED_BRUSH = 200; // Brush motor speed
+const int MOTOR_SPEED_GEAR = 200; // Gearbox motor speed
 const float MOTOR_PERIODE = 100.0; // Periode in milliseconds
 const float LED_PERIODE = 100.0; // Periode in milliseconds
-const float CURRENT_PERIODE = 100.0; // Periode in milliseconds
+const float CURRENT_PERIODE = 500.0; // Periode in milliseconds
 const float BUTTON_PERIODE = 30.0; // Periode in milliseconds
 const float VALVE_PERIODE = 1000.0; // Periode in milliseconds
 bool buttonStateR = HIGH, buttonStateC1 = HIGH, buttonStateC2 = HIGH; // Current state of buttons. state is true when not pressed.
@@ -237,6 +237,7 @@ void checkCurrent(int currentPin) {
     if (millis() - last_time >= CURRENT_PERIODE) {
         float currentVal = analogRead(currentPin);
         currentVal = (2.5 - (currentVal * (5.0 / 1024.0))) / CURRENT_SENSITIVITY;
+        currentVal = abs(currentVal);
         Serial.print("Current Value: ");
         Serial.print(currentVal, 5);
         Serial.println(" [A]");

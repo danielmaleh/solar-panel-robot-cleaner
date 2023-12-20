@@ -12,6 +12,9 @@
 // connecter les resistances et la LED qui soit visible.
 // fixer l'elec sur la plaque final
 // connecter suivant le schema electronique et le mettre a jour.
+// changer serial begis et initializationcommunication..
+// attention au definitions des pins des boutons.
+// 
 // --> GRADE rain sensor
 // --> mettre les capteurs de courant pour le stepper (x2) et pour le gearbox motor (x1) 
 // --> Faire les branchements propres sur la vraie plaquette 
