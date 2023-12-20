@@ -25,13 +25,13 @@ void setup() {
 // Main loop
 void loop() {
     Serial.println("LOOP");
-    moveMotor(UP, 5);
+    moveMotor(UP, 220);
     Serial.println("moveMotor1");
     delay(2000);
     stopAllMotors();
     Serial.println("stopAllMotors1");
     delay(2000);
-    moveMotor(DOWN, 5);
+    moveMotor(DOWN, 220);
     Serial.println("moveMotor2");
     delay(2000);
     stopAllMotors();

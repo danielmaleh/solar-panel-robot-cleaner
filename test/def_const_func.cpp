@@ -374,7 +374,8 @@ void moveMotor(MotorDirection direction, float distanceOrSpeed) {
                 controlGearboxMotor(false, distanceOrSpeed); // Fixed speed
                 break;
             case LEFT:
-                controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
+                //controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
+                control_stepper_bis(distanceOrSpeed, false);
                 break;
             case RIGHT:
                 //controlStepper(distanceOrSpeed, true, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming true is right
