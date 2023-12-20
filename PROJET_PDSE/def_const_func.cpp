@@ -158,6 +158,20 @@ void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int ste
         stepDelay += stepChange;
     }
 }
+
+void controlStepper(int distance, bool clockwise) {
+    digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
+
+    int totalSteps = distance / CM_PER_REVOLUTION * STEPPER_STEPS_PER_REVOLUTION;
+
+    // Constant speed
+    for (int i = 0; i < totalSteps; i++) {
+        digitalWrite(STEPPER_STEP_PIN, HIGH);
+        delayMicroseconds(stepperEndSpeed);
+        digitalWrite(STEPPER_STEP_PIN, LOW);
+        delayMicroseconds(stepperEndSpeed);
+    }
+}
 //------------------------------------LEDs------------------------------------
 void updateLEDs(State currentState) {
     static unsigned long last_time = 0;
@@ -352,9 +366,11 @@ void moveMotor(MotorDirection direction, float distanceOrSpeed) {
                 break;
             case LEFT:
                 controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
+                controlStepper(distanceOrSpeed, false); // Assuming false is left 
                 break;
             case RIGHT:
                 controlStepper(distanceOrSpeed, true, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming true is right
+                controlStepper(distanceOrSpeed, true); // Assuming true is right
                 break;
         }
         last_time = millis();
