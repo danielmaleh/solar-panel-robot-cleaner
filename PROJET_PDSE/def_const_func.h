@@ -155,6 +155,7 @@ void controlGearboxMotor(bool direction, int speed);
 
 //------------------------------------STEPPER------------------------------------
 void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int stepperEndSpeed, int stepperAccelerationSteps);
+void controlStepper(int distance, bool clockwise);
 
 //------------------------------------LEDs------------------------------------
 void updateLEDs(State currentState);

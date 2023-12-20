@@ -92,7 +92,10 @@ void loop() {
     Serial.println("controlGearboxMotor");
     delay(2000);
     controlStepper(5, true, 5, 5, 5);
-    Serial.println("controlStepper");
+    Serial.println("controlStepper1");
+    delay(2000);
+    controlStepper(5, true);
+    Serial.println("controlStepper2");
     delay(2000);
     controlValve(90);
     Serial.println("controlValve");
