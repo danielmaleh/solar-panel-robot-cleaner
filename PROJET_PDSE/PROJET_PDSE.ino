@@ -194,10 +194,13 @@ void loop() {
             else if (IRseen == false) {
                 Serial.println("IF20");
                 moveMotor(UP, MOTOR_SPEED_GEAR);
+                break; 
             }
             else if (buttonStateChome == RELEASED) {
+                stopAllMotors(); 
                 Serial.println("IF21");
                 moveMotor(RIGHT, step);
+                break; 
             }
             else {
                 Serial.println("IF22");
