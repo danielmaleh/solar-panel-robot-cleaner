@@ -194,18 +194,18 @@ void loop() {
             else if (IRseen == false) {
                 Serial.println("IF20");
                 moveMotor(UP, MOTOR_SPEED_GEAR);
-                break; 
             }
-            else if (buttonStateChome == RELEASED) {
+            if (IRseen == true) {
+              moveMotor(UP, 200);
+              delay(500); 
+              while (buttonStateChome == RELEASED) {
                 stopAllMotors(); 
                 Serial.println("IF21");
-                moveMotor(RIGHT, step);
-                break; 
-            }
-            else {
-                Serial.println("IF22");
-                stopAllMotors();
-                currentState = REST;
+                moveMotor(LEFT, step);
+              }
+              Serial.println("IF22");
+              stopAllMotors();
+              currentState = REST;
             }
         break;
         case PROBLEM:
