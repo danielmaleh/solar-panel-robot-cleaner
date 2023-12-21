@@ -44,6 +44,8 @@ enum MotorDirection {
     UP, DOWN, LEFT, RIGHT
 };
 
+enum ButtonState { CLICKED, RELEASED };
+
 
 //------------------------------------IR------------------------------------
 // GRADING:
@@ -121,20 +123,21 @@ extern const float CURRENT_PERIODE;
 
 #define BUTTON_PIN_R 22 // End of travel button on robot 3
 #define BUTTON_PIN_C1 24 // End of travel button on carrige 2
-#define BUTTON_PIN_C2 26 // End of travel button on resting station 1
+#define BUTTON_PIN_Chome 26 // End of travel button on resting station 1
 
 // Debouncing Variables
-extern unsigned long lastDebounceTimeR, lastDebounceTimeC1, lastDebounceTimeC2;
-extern bool lastButtonStateR, lastButtonStateC1, lastButtonStateC2;
+extern unsigned long lastDebounceTimeR, lastDebounceTimeC1, lastDebounceTimeChome;
+extern bool lastButtonStateR, lastButtonStateC1, lastButtonStateChome;
 
-extern bool buttonStateR, buttonStateC1, buttonStateC2;
+extern bool buttonStateR, buttonStateC1, buttonStateChome;
 
 extern const float BUTTON_PERIODE;
 
 
 //------------------------------------VALVE (SERVO)------------------------------------
-#define SERVO_PIN 13 // Define the pin connected to the servo
-#define VALVE_ANGLE 90 // Angle of the valve in degrees
+#define SERVO_PIN 13 
+#define VALVE_ANGLE_OPEN 180 // Angle of the valve in degrees open
+#define VALVE_ANGLE_CLOSE 0 // Angle of the valve in degrees closed
 extern const float VALVE_PERIODE;
 
 
@@ -146,7 +149,6 @@ void initializeLEDPins();
 void initializeRainSensor();
 void initializeStepperMotor();
 void initializeCurrentSensors();
-void initializeSerialCommunication();
 
 
 // State functions
@@ -181,7 +183,7 @@ void checkCurrent(int currentPin);
 //------------------------------------BUTTONS------------------------------------
 void checkButtonR();
 void checkButtonC1();
-void checkButtonC2();
+void checkButtonChome();
 
 //------------------------------------VALVE (Servo)------------------------------------
 void controlValve(int angle);
