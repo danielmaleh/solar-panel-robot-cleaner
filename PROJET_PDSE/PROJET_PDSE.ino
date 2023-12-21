@@ -113,8 +113,11 @@ void loop() {
             // Else go downward with dc motor and activate dc brush motor and valve (until buttonR=1).
             if (buttonStateR == RELEASED) {
                 Serial.println("IF10");
-                delay(END_OF_CLEANING_DELAY);
+                // Stop Brush motor
+                digitalWrite(BRUSH_MOTOR_PIN1, LOW);
+                digitalWrite(BRUSH_MOTOR_PIN2, LOW);
                 controlValve(VALVE_ANGLE_CLOSE);
+                delay(END_OF_CLEANING_DELAY);
                 stopAllMotors();
                 currentState = UP_TRAVEL;
             }

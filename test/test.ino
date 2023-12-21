@@ -45,7 +45,7 @@ void setup() {
 void loop() {
     delay(5000);
     Serial.println("LOOP");
-    moveMotor(UP, 220);
+    moveMotor(UP, 250);
     Serial.println("moveMotor1"); 
     delay(1000);
     stopAllMotors();
@@ -72,7 +72,7 @@ void loop() {
     updateLEDs(REST);
     Serial.println("updateLEDs3");
     delay(1000);
-    moveMotor(DOWN, 220);
+    moveMotor(DOWN, 250);
     Serial.println("moveMotor2");
     delay(1000);
     stopAllMotors();

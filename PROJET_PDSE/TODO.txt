@@ -10,6 +10,8 @@
 // mettre a jour les 2 schema elec.
 // changer serial begis et initializationcommunication..
 // button c1 and c2 are extremities and r is the old c1 as well.
+// mesurer dist total
+// grade stepper steps
 // check directions, opening closing.
 // --> GRADE rain sensor
 // --> mettre les capteurs de courant pour le stepper (x2) et pour le gearbox motor (x1) 

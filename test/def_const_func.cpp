@@ -13,7 +13,7 @@ bool raining = false; // Boolean indicating if it is raining
 bool IRseen = false; // Value of the IR sensor
 unsigned long currentTime; // Actual time
 unsigned long cleaningTime = 0.0; // Time of the last cleaning
-int stepperStartSpeed = 1300, stepperEndSpeed = 1000, stepperAccelerationSteps = 300;
+int stepperStartSpeed = 1500, stepperEndSpeed = 1000, stepperAccelerationSteps = 500;
 const float IR_PERIODE = 1.0; // Periode in milliseconds
 const float RAIN_SENSOR_PERIODE = 1000.0; // Periode in milliseconds
 const int MOTOR_SPEED_BRUSH = 200; // Brush motor speed
@@ -43,7 +43,6 @@ void initializeMotors() {
     // Initialize brush motor pins
     pinMode(BRUSH_MOTOR_PIN1, OUTPUT);
     pinMode(BRUSH_MOTOR_PIN2, OUTPUT);
-    pinMode(BRUSH_MOTOR_SPEED_PIN, OUTPUT);
 }
 
 void initializeButtons() {
@@ -169,7 +168,7 @@ void controlStepper(int distance, bool clockwise) {
 
 
     int totalSteps = distance / CM_PER_REVOLUTION * STEPPER_STEPS_PER_REVOLUTION;
-    digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
+    digitalWrite(STEPPER_DIR_PIN, clockwise ? LOW : HIGH);
 
     // Constant speed
     for (int i = 0; i < totalSteps; i++) {
@@ -388,12 +387,12 @@ void moveMotor(MotorDirection direction, float distanceOrSpeed) {
                 controlGearboxMotor(false, distanceOrSpeed); // Fixed speed
                 break;
             case LEFT:
-                controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
-                // controlStepper(distanceOrSpeed, false); // Assuming false is left 
+                // controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
+                controlStepper(distanceOrSpeed, false); // Assuming false is left 
                 break;
             case RIGHT:
-                controlStepper(distanceOrSpeed, true, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming true is right
-                // controlStepper(distanceOrSpeed, true); // Assuming true is right
+                // controlStepper(distanceOrSpeed, true, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming true is right
+                controlStepper(distanceOrSpeed, true); // Assuming true is right
                 break;
         }
         last_time = millis();
