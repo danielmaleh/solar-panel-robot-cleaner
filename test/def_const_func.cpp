@@ -107,11 +107,9 @@ void checkRainSensor() {
 
 
 //------------------------------------DC_BRUSH------------------------------------
-void controlBrushMotor(bool direction, int speed) {
+void controlBrushMotor(bool direction) {
     digitalWrite(BRUSH_MOTOR_PIN1, direction ? HIGH : LOW);
     digitalWrite(BRUSH_MOTOR_PIN2, direction ? LOW : HIGH);
-    analogWrite(BRUSH_MOTOR_SPEED_PIN, speed);
-
 }
 
 
@@ -412,4 +410,8 @@ void stopAllMotors() {
     // Stop Gearbox motor
     digitalWrite(GEARBOX_MOTOR_PIN1, LOW);
     digitalWrite(GEARBOX_MOTOR_PIN2, LOW);
+
+    // Stop Brush motor
+    digitalWrite(BRUSH_MOTOR_PIN1, LOW);
+    digitalWrite(BRUSH_MOTOR_PIN2, LOW);
 }

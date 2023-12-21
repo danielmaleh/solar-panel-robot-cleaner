@@ -81,7 +81,7 @@ void loop() {
     updateLEDs(RETURN_HOME);
     Serial.println("updateLEDs4");
     delay(1000);
-    controlBrushMotor(true, 230); // what is happening? what direction?
+    controlBrushMotor(true); // what is happening? what direction?
     Serial.println("controlBrushMotor"); 
     delay(1000);
     updateLEDs(TRANSLATION);

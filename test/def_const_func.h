@@ -73,9 +73,6 @@ extern const float RAIN_SENSOR_PERIODE;
 //------------------------------------DC_BRUSH------------------------------------
 #define BRUSH_MOTOR_PIN1 6
 #define BRUSH_MOTOR_PIN2 7
-#define BRUSH_MOTOR_SPEED_PIN 10
-
-extern const int MOTOR_SPEED_BRUSH;
 
 
 //------------------------------------DC_GEAR------------------------------------
@@ -159,7 +156,7 @@ void checkIRSensor();
 void checkRainSensor();
 
 //------------------------------------DC_BRUSH------------------------------------
-void controlBrushMotor(bool direction, int speed);
+void controlBrushMotor(bool direction);
 
 //------------------------------------DC_GEAR------------------------------------
 void controlGearboxMotor(bool direction, int speed);
