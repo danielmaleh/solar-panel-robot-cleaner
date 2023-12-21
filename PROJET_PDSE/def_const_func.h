@@ -15,10 +15,11 @@
 
 //------------------------------------GENERAL------------------------------------
 #define CLEANING_WIDTH 30 // Effective cleaning width in cm
-#define CLEANING_PERIOD 1000*60 // Time between two cleanings in milliseconds
-#define DIST 107 // Total width of one panels in cm
-#define DIST_TO_INITIAL_POSITION 40 // Distance to the initial position in cm
-#define END_OF_CLEANING_DELAY 2000 // Delay after cleaning in milliseconds, for the wheel to get down
+#define CLEANING_PERIOD 10000 // Time between two cleanings in milliseconds
+#define DIST 100 // Total width of one panel in cm
+#define DIST_TO_INITIAL_POSITION 46
+ // Distance to the initial position in cm
+#define END_OF_CLEANING_DELAY 1500 // Delay after cleaning in milliseconds, for the wheel to get down
 
 // Global variables
 #ifndef MYSERVO_H
@@ -55,7 +56,7 @@ enum ButtonState { CLICKED, RELEASED };
 // 460,470 = at 10cm
 // >600 = < 5cm. Si trop proche la valeur rebaisse.
 
-#define IR_THRESHOLD 200 
+#define IR_THRESHOLD 600 
 #define IR_SENSOR_PIN A4 
 
 extern const float IR_PERIODE;
@@ -73,9 +74,6 @@ extern const float RAIN_SENSOR_PERIODE;
 //------------------------------------DC_BRUSH------------------------------------
 #define BRUSH_MOTOR_PIN1 6
 #define BRUSH_MOTOR_PIN2 7
-#define BRUSH_MOTOR_SPEED_PIN 10
-
-extern const int MOTOR_SPEED_BRUSH;
 
 
 //------------------------------------DC_GEAR------------------------------------
@@ -90,7 +88,7 @@ extern const float MOTOR_PERIODE;
 //------------------------------------STEPPER------------------------------------
 // GRADING:
 // 20cm in 5 rev. = 4 cm per rev.
-#define CM_PER_REVOLUTION 4.0 // 4 cm per revolution
+#define CM_PER_REVOLUTION 2.0 // 4 cm per revolution
 #define STEPPER_STEPS_PER_REVOLUTION 200 //remove??
 
 #define STEPPER_DIR_PIN 2
@@ -159,7 +157,7 @@ void checkIRSensor();
 void checkRainSensor();
 
 //------------------------------------DC_BRUSH------------------------------------
-void controlBrushMotor(bool direction, int speed);
+void controlBrushMotor(bool direction);
 
 //------------------------------------DC_GEAR------------------------------------
 void controlGearboxMotor(bool direction, int speed);

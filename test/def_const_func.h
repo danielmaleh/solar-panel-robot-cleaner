@@ -16,8 +16,8 @@
 //------------------------------------GENERAL------------------------------------
 #define CLEANING_WIDTH 30 // Effective cleaning width in cm
 #define CLEANING_PERIOD 1000*60 // Time between two cleanings in milliseconds
-#define DIST 107 // Total width of one panels in cm
-#define DIST_TO_INITIAL_POSITION 40 // Distance to the initial position in cm
+#define DIST 100 // Total width of one panel in cm
+#define DIST_TO_INITIAL_POSITION 45 // Distance to the initial position in cm
 #define END_OF_CLEANING_DELAY 2000 // Delay after cleaning in milliseconds, for the wheel to get down
 
 // Global variables
@@ -87,7 +87,7 @@ extern const float MOTOR_PERIODE;
 //------------------------------------STEPPER------------------------------------
 // GRADING:
 // 20cm in 5 rev. = 4 cm per rev.
-#define CM_PER_REVOLUTION 4.0 // 4 cm per revolution
+#define CM_PER_REVOLUTION 2.0 // 4 cm per revolution
 #define STEPPER_STEPS_PER_REVOLUTION 200 //remove??
 
 #define STEPPER_DIR_PIN 2

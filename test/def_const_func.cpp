@@ -363,8 +363,8 @@ void rotateServo(int angle) {
     // Convert angle to microseconds
     if (angle >= 0 && angle <= 180) {
         // You can adjust these values if your servo has a different range
-        int minPulseWidth = 800;
-        int maxPulseWidth = 2200;
+        int minPulseWidth = 0;
+        int maxPulseWidth = 5000;
         int pulseWidth = map(angle, 0, 180, minPulseWidth, maxPulseWidth); // Map angle to microseconds
         myServo.writeMicroseconds(pulseWidth);
         Serial.print("Angle: ");

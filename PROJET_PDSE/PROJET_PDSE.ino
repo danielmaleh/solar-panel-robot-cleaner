@@ -19,6 +19,10 @@ void setup() {
     Serial.println("SETUP6");
     void initializeCurrentSensors();
     Serial.println("SETUP7");
+    checkButtonChome();
+    if (buttonStateChome == RELEASED) {
+        currentState = RETURN_HOME;
+    }
 }
 
 // Main loop
@@ -27,10 +31,17 @@ void loop() {
         updateLEDs(currentState);
         return;
     }
-    if (buttonStateC1 == CLICKED && currentState != TRANSLATION) {
-        Serial.println("IF0");
-        currentState = PROBLEM;
+
+    if (buttonStateC1 == CLICKED){ // A voir si dernier netoyage apres ou avant clic
+        Serial.println("IF17");
+        stopAllMotors();
+        currentState = RETURN_HOME;
+        if (currentState != TRANSLATION) {
+            Serial.println("IF0");
+            currentState = PROBLEM;
+        }
     }
+
     Serial.println("LOOP");
     // Update the current time
     currentTime = millis();
@@ -64,7 +75,7 @@ void loop() {
             }
             else if ((currentTime >= cleaningTime + CLEANING_PERIOD) || raining) {
                 Serial.println("IF3");
-                if (raining) {
+                if (!raining) {
                     Serial.println("IF4");
                     currentState = WATER_FILLING;
                 }
@@ -124,7 +135,7 @@ void loop() {
             else {
                 Serial.println("IF11");
                 moveMotor(DOWN, MOTOR_SPEED_GEAR);
-                controlBrushMotor(HIGH, MOTOR_SPEED_BRUSH);
+                controlBrushMotor(HIGH);
                 controlValve(VALVE_ANGLE_OPEN);
             }
         break;
@@ -152,6 +163,8 @@ void loop() {
                     break;
                 }
                 currentState = TRANSLATION;
+                stopAllMotors();
+                moveMotor(LEFT, step);
             }
         break;
         case TRANSLATION:
@@ -161,13 +174,7 @@ void loop() {
             // when stepper motor finished move upwards with dc motor until buttonR=0 and then state = CLEANING
             if (buttonStateR == RELEASED) {
                 Serial.println("IF16");
-                moveMotor(LEFT, step);
                 moveMotor(UP, MOTOR_SPEED_GEAR);
-            }
-            else if (buttonStateC1 == CLICKED){
-                Serial.println("IF17");
-                stopAllMotors();
-                currentState = RETURN_HOME;
             }
             else {
                 Serial.println("IF18");

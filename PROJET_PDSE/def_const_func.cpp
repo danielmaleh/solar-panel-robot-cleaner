@@ -13,11 +13,10 @@ bool raining = false; // Boolean indicating if it is raining
 bool IRseen = false; // Value of the IR sensor
 unsigned long currentTime; // Actual time
 unsigned long cleaningTime = 0.0; // Time of the last cleaning
-int stepperStartSpeed = 1300, stepperEndSpeed = 1000, stepperAccelerationSteps = 300;
+int stepperStartSpeed = 1500, stepperEndSpeed = 1000, stepperAccelerationSteps = 500;
 const float IR_PERIODE = 1.0; // Periode in milliseconds
 const float RAIN_SENSOR_PERIODE = 1000.0; // Periode in milliseconds
-const int MOTOR_SPEED_BRUSH = 200; // Brush motor speed
-const int MOTOR_SPEED_GEAR = 200; // Gearbox motor speed
+const int MOTOR_SPEED_GEAR = 250; // Gearbox motor speed
 const float MOTOR_PERIODE = 100.0; // Periode in milliseconds
 const float LED_PERIODE = 100.0; // Periode in milliseconds
 const float CURRENT_PERIODE = 500.0; // Periode in milliseconds
@@ -43,7 +42,6 @@ void initializeMotors() {
     // Initialize brush motor pins
     pinMode(BRUSH_MOTOR_PIN1, OUTPUT);
     pinMode(BRUSH_MOTOR_PIN2, OUTPUT);
-    pinMode(BRUSH_MOTOR_SPEED_PIN, OUTPUT);
 }
 
 void initializeButtons() {
@@ -107,11 +105,9 @@ void checkRainSensor() {
 
 
 //------------------------------------DC_BRUSH------------------------------------
-void controlBrushMotor(bool direction, int speed) {
+void controlBrushMotor(bool direction) {
     digitalWrite(BRUSH_MOTOR_PIN1, direction ? HIGH : LOW);
     digitalWrite(BRUSH_MOTOR_PIN2, direction ? LOW : HIGH);
-    analogWrite(BRUSH_MOTOR_SPEED_PIN, speed);
-
 }
 
 
@@ -133,7 +129,7 @@ void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int ste
     int stepDelay = stepperStartSpeed;
     int stepChange = (stepperStartSpeed - stepperEndSpeed) / stepperAccelerationSteps;
 
-    digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
+    digitalWrite(STEPPER_DIR_PIN, clockwise ? LOW : HIGH);
 
     // Accelerate
     for (int i = 0; i < stepperAccelerationSteps && i < totalSteps; i++) {
@@ -366,8 +362,8 @@ void rotateServo(int angle) {
     // Convert angle to microseconds
     if (angle >= 0 && angle <= 180) {
         // You can adjust these values if your servo has a different range
-        int minPulseWidth = 800;
-        int maxPulseWidth = 2200;
+        int minPulseWidth = 0;
+        int maxPulseWidth = 5000;
         int pulseWidth = map(angle, 0, 180, minPulseWidth, maxPulseWidth); // Map angle to microseconds
         myServo.writeMicroseconds(pulseWidth);
         Serial.print("Angle: ");
@@ -390,12 +386,12 @@ void moveMotor(MotorDirection direction, float distanceOrSpeed) {
                 controlGearboxMotor(false, distanceOrSpeed); // Fixed speed
                 break;
             case LEFT:
-                controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
-                // controlStepper(distanceOrSpeed, false); // Assuming false is left 
+                // controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
+                controlStepper(distanceOrSpeed, false); // Assuming false is left 
                 break;
             case RIGHT:
-                controlStepper(distanceOrSpeed, true, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming true is right
-                // controlStepper(distanceOrSpeed, true); // Assuming true is right
+                // controlStepper(distanceOrSpeed, true, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming true is right
+                controlStepper(distanceOrSpeed, true); // Assuming true is right
                 break;
         }
         last_time = millis();
@@ -412,4 +408,8 @@ void stopAllMotors() {
     // Stop Gearbox motor
     digitalWrite(GEARBOX_MOTOR_PIN1, LOW);
     digitalWrite(GEARBOX_MOTOR_PIN2, LOW);
+
+    // Stop Brush motor
+    digitalWrite(BRUSH_MOTOR_PIN1, LOW);
+    digitalWrite(BRUSH_MOTOR_PIN2, LOW);
 }
