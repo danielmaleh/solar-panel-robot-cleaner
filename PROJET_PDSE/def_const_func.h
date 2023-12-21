@@ -21,6 +21,15 @@
 #define END_OF_CLEANING_DELAY 2000 // Delay after cleaning in milliseconds, for the wheel to get down
 
 // Global variables
+#ifndef MYSERVO_H
+#define MYSERVO_H
+
+#include <Servo.h>
+
+extern Servo myServo; // Declaration of the Servo object
+
+#endif
+
 extern int step;
 extern int nb_cycles_counter; // Counter for the number of cycles
 extern bool raining; // Boolean indicating if it is raining
@@ -34,6 +43,8 @@ extern State currentState;
 enum MotorDirection {
     UP, DOWN, LEFT, RIGHT
 };
+
+enum ButtonState { CLICKED, RELEASED };
 
 
 //------------------------------------IR------------------------------------
@@ -84,6 +95,7 @@ extern const float MOTOR_PERIODE;
 
 #define STEPPER_DIR_PIN 2
 #define STEPPER_STEP_PIN 3
+#define STEPPER_SLEEP_PIN 28
 extern int stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps;
 
 
@@ -111,33 +123,32 @@ extern const float CURRENT_PERIODE;
 
 #define BUTTON_PIN_R 22 // End of travel button on robot 3
 #define BUTTON_PIN_C1 24 // End of travel button on carrige 2
-#define BUTTON_PIN_C2 26 // End of travel button on resting station 1
+#define BUTTON_PIN_Chome 26 // End of travel button on resting station 1
 
 // Debouncing Variables
-extern unsigned long lastDebounceTimeR, lastDebounceTimeC1, lastDebounceTimeC2;
-extern bool lastButtonStateR, lastButtonStateC1, lastButtonStateC2;
+extern unsigned long lastDebounceTimeR, lastDebounceTimeC1, lastDebounceTimeChome;
+extern bool lastButtonStateR, lastButtonStateC1, lastButtonStateChome;
 
-extern bool buttonStateR, buttonStateC1, buttonStateC2;
+extern bool buttonStateR, buttonStateC1, buttonStateChome;
 
 extern const float BUTTON_PERIODE;
 
 
 //------------------------------------VALVE (SERVO)------------------------------------
-#define SERVO_PIN 13 // Define the pin connected to the servo
-#define VALVE_ANGLE 90 // Angle of the valve in degrees
+#define SERVO_PIN 13 
+#define VALVE_ANGLE_OPEN 180 // Angle of the valve in degrees open
+#define VALVE_ANGLE_CLOSE 0 // Angle of the valve in degrees closed
 extern const float VALVE_PERIODE;
 
 
 //====================================FUNCTION DECLARATIONS====================================
 // Initialization functions
-void initializeServo();
 void initializeMotors();
 void initializeButtons();
 void initializeLEDPins();
 void initializeRainSensor();
 void initializeStepperMotor();
 void initializeCurrentSensors();
-void initializeSerialCommunication();
 
 
 // State functions
@@ -172,7 +183,7 @@ void checkCurrent(int currentPin);
 //------------------------------------BUTTONS------------------------------------
 void checkButtonR();
 void checkButtonC1();
-void checkButtonC2();
+void checkButtonChome();
 
 //------------------------------------VALVE (Servo)------------------------------------
 void controlValve(int angle);

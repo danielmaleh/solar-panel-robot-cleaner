@@ -21,6 +21,15 @@
 #define END_OF_CLEANING_DELAY 2000 // Delay after cleaning in milliseconds, for the wheel to get down
 
 // Global variables
+#ifndef MYSERVO_H
+#define MYSERVO_H
+
+#include <Servo.h>
+
+extern Servo myServo; // Declaration of the Servo object
+
+#endif
+
 extern int step;
 extern int nb_cycles_counter; // Counter for the number of cycles
 extern bool raining; // Boolean indicating if it is raining
@@ -84,7 +93,6 @@ extern const float MOTOR_PERIODE;
 
 #define STEPPER_DIR_PIN 2
 #define STEPPER_STEP_PIN 3
-// sleep pin to monitor power consumption when the motor doesn't move 
 #define STEPPER_SLEEP_PIN 28
 extern int stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps;
 
@@ -132,7 +140,6 @@ extern const float VALVE_PERIODE;
 
 //====================================FUNCTION DECLARATIONS====================================
 // Initialization functions
-void initializeServo();
 void initializeMotors();
 void initializeButtons();
 void initializeLEDPins();
@@ -156,8 +163,8 @@ void controlBrushMotor(bool direction, int speed);
 void controlGearboxMotor(bool direction, int speed);
 
 //------------------------------------STEPPER------------------------------------
-//void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int stepperEndSpeed, int stepperAccelerationSteps);
-void control_stepper_bis(int distance, bool clockwise); 
+void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int stepperEndSpeed, int stepperAccelerationSteps);
+void controlStepper(int distance, bool clockwise);
 
 //------------------------------------LEDs------------------------------------
 void updateLEDs(State currentState);

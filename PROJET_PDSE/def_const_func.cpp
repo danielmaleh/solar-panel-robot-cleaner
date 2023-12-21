@@ -12,8 +12,8 @@ int nb_cycles_counter = 0;
 bool raining = false; // Boolean indicating if it is raining
 bool IRseen = false; // Value of the IR sensor
 unsigned long currentTime; // Actual time
-unsigned long cleaningTime; // Time of the last cleaning
-int stepperStartSpeed = 1000, stepperEndSpeed = 700, stepperAccelerationSteps = 300;
+unsigned long cleaningTime = 0.0; // Time of the last cleaning
+int stepperStartSpeed = 1300, stepperEndSpeed = 1000, stepperAccelerationSteps = 300;
 const float IR_PERIODE = 1.0; // Periode in milliseconds
 const float RAIN_SENSOR_PERIODE = 1000.0; // Periode in milliseconds
 const int MOTOR_SPEED_BRUSH = 200; // Brush motor speed
@@ -23,20 +23,16 @@ const float LED_PERIODE = 100.0; // Periode in milliseconds
 const float CURRENT_PERIODE = 500.0; // Periode in milliseconds
 const float BUTTON_PERIODE = 30.0; // Periode in milliseconds
 const float VALVE_PERIODE = 1000.0; // Periode in milliseconds
-bool buttonStateR = HIGH, buttonStateC1 = HIGH, buttonStateC2 = HIGH; // Current state of buttons. state is true when not pressed.
+bool buttonStateR = RELEASED, buttonStateC1 = RELEASED, buttonStateChome = CLICKED; // Current state of buttons. state is true when not pressed.
 
 // Debouncing Variables
-unsigned long lastDebounceTimeR = 0, lastDebounceTimeC1 = 0, lastDebounceTimeC2 = 0; // Last debounce time for buttons
-bool lastButtonStateR = HIGH, lastButtonStateC1 = HIGH, lastButtonStateC2 = HIGH; // Previous state of buttons
+unsigned long lastDebounceTimeR = 0, lastDebounceTimeC1 = 0, lastDebounceTimeChome = 0; // Last debounce time for buttons
+bool lastButtonStateR = RELEASED, lastButtonStateC1 = RELEASED, lastButtonStateChome = CLICKED; // Previous state of buttons
 
 
 State currentState = REST; // Initial state
 
 //------------------------------------END GLOBAL DEFINITIONS------------------------------------
-
-void initializeServo() {
-    myServo.attach(SERVO_PIN);  // Attaches the servo on SERVO_PIN to the Servo object
-}
 
 void initializeMotors() {
     // Initialize gearbox motor pins
@@ -53,7 +49,7 @@ void initializeMotors() {
 void initializeButtons() {
     pinMode(BUTTON_PIN_R, INPUT);
     pinMode(BUTTON_PIN_C1, INPUT);
-    pinMode(BUTTON_PIN_C2, INPUT);
+    pinMode(BUTTON_PIN_Chome, INPUT);
 }
 
 void initializeLEDPins() {
@@ -76,10 +72,6 @@ void initializeCurrentSensors() {
     pinMode(CURRENT_PIN2, INPUT);
 }
 
-void initializeSerialCommunication() {
-    Serial.begin(9600);
-}
-
 
 //------------------------------------IR------------------------------------
 void checkIRSensor() {
@@ -96,6 +88,8 @@ void checkIRSensor() {
         last_time = millis();
     }
 }
+
+
 //------------------------------------RAIN------------------------------------
 void checkRainSensor() {
     static unsigned long last_time = 0;
@@ -110,6 +104,8 @@ void checkRainSensor() {
         last_time = millis();
     }
 }
+
+
 //------------------------------------DC_BRUSH------------------------------------
 void controlBrushMotor(bool direction, int speed) {
     digitalWrite(BRUSH_MOTOR_PIN1, direction ? HIGH : LOW);
@@ -117,6 +113,8 @@ void controlBrushMotor(bool direction, int speed) {
     analogWrite(BRUSH_MOTOR_SPEED_PIN, speed);
 
 }
+
+
 //------------------------------------DC_GEAR------------------------------------
 void controlGearboxMotor(bool direction, int speed) {
     digitalWrite(GEARBOX_MOTOR_PIN1, direction ? HIGH : LOW);
@@ -124,13 +122,18 @@ void controlGearboxMotor(bool direction, int speed) {
     analogWrite(GEARBOX_MOTOR_SPEED_PIN, speed);
 
 }
+
+
 //------------------------------------STEPPER------------------------------------
 void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int stepperEndSpeed, int stepperAccelerationSteps) {
-    digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
+    digitalWrite(STEPPER_SLEEP_PIN, HIGH);
+    delayMicroseconds(2);
 
     int totalSteps = distance / CM_PER_REVOLUTION * STEPPER_STEPS_PER_REVOLUTION;
     int stepDelay = stepperStartSpeed;
     int stepChange = (stepperStartSpeed - stepperEndSpeed) / stepperAccelerationSteps;
+
+    digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
 
     // Accelerate
     for (int i = 0; i < stepperAccelerationSteps && i < totalSteps; i++) {
@@ -157,12 +160,18 @@ void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int ste
         delayMicroseconds(stepDelay);
         stepDelay += stepChange;
     }
+
+    digitalWrite(STEPPER_STEP_PIN, LOW);
+    digitalWrite(STEPPER_SLEEP_PIN, LOW);
 }
 
 void controlStepper(int distance, bool clockwise) {
-    digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
+    digitalWrite(STEPPER_SLEEP_PIN, HIGH);
+    delayMicroseconds(2);
+
 
     int totalSteps = distance / CM_PER_REVOLUTION * STEPPER_STEPS_PER_REVOLUTION;
+    digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
 
     // Constant speed
     for (int i = 0; i < totalSteps; i++) {
@@ -171,7 +180,12 @@ void controlStepper(int distance, bool clockwise) {
         digitalWrite(STEPPER_STEP_PIN, LOW);
         delayMicroseconds(stepperEndSpeed);
     }
+
+    digitalWrite(STEPPER_STEP_PIN, LOW);
+    digitalWrite(STEPPER_SLEEP_PIN, LOW);
 }
+
+
 //------------------------------------LEDs------------------------------------
 void updateLEDs(State currentState) {
     static unsigned long last_time = 0;
@@ -245,6 +259,8 @@ void writeColor(int red, int green, int blue) {
     analogWrite(GREEN_LED_PIN, green);
     analogWrite(BLUE_LED_PIN, blue);
 }
+
+
 //------------------------------------CURRENT------------------------------------
 void checkCurrent(int currentPin) {
     static unsigned long last_time = 0;
@@ -276,6 +292,8 @@ void checkCurrent(int currentPin) {
         last_time = millis();
     }
 }
+
+
 //------------------------------------BUTTONS------------------------------------
 void checkButtonR() {
     static unsigned long last_time = 0;
@@ -296,21 +314,21 @@ void checkButtonR() {
     }
 }
 
-void checkButtonC2() {
+void checkButtonChome() {
     static unsigned long last_time = 0;
     if (millis() - last_time >= BUTTON_PERIODE) {
         // Debounce button 1
-        bool readingC2 = digitalRead(BUTTON_PIN_C2);
-        if (readingC2 != lastButtonStateC2) {
-            lastDebounceTimeC2 = millis();
+        bool readingChome = digitalRead(BUTTON_PIN_Chome);
+        if (readingChome != lastButtonStateChome) {
+            lastDebounceTimeChome = millis();
         }
-        if ((millis() - lastDebounceTimeC2) > DEBOUNCE_DELAY) {
-            if (readingC2 != buttonStateC2) {
-                buttonStateC2 = readingC2;
-                Serial.println("Button C2 changed");    
+        if ((millis() - lastDebounceTimeChome) > DEBOUNCE_DELAY) {
+            if (readingChome != buttonStateChome) {
+                buttonStateChome = readingChome;
+                Serial.println("Button Chome changed");    
             }
         }
-        lastButtonStateC2 = readingC2;
+        lastButtonStateChome = readingChome;
         last_time = millis();
     }
 }
@@ -333,6 +351,8 @@ void checkButtonC1() {
         last_time = millis();
     }
 }
+
+
 //------------------------------------VALVE (Servo)------------------------------------
 void controlValve(int angle) {
     static unsigned long last_time = 0;
@@ -345,7 +365,10 @@ void controlValve(int angle) {
 void rotateServo(int angle) {
     // Convert angle to microseconds
     if (angle >= 0 && angle <= 180) {
-        int pulseWidth = map(angle, 0, 180, 1000, 2000); // Map angle to microseconds
+        // You can adjust these values if your servo has a different range
+        int minPulseWidth = 800;
+        int maxPulseWidth = 2200;
+        int pulseWidth = map(angle, 0, 180, minPulseWidth, maxPulseWidth); // Map angle to microseconds
         myServo.writeMicroseconds(pulseWidth);
         Serial.print("Angle: ");
         Serial.println(angle);
@@ -353,6 +376,8 @@ void rotateServo(int angle) {
         Serial.println("Angle out of range");
     }
 }
+
+
 //------------------------------------MOTORS MOUVEMENT------------------------------------
 void moveMotor(MotorDirection direction, float distanceOrSpeed) {
     static unsigned long last_time = 0;
@@ -366,28 +391,25 @@ void moveMotor(MotorDirection direction, float distanceOrSpeed) {
                 break;
             case LEFT:
                 controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
-                controlStepper(distanceOrSpeed, false); // Assuming false is left 
+                // controlStepper(distanceOrSpeed, false); // Assuming false is left 
                 break;
             case RIGHT:
                 controlStepper(distanceOrSpeed, true, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming true is right
-                controlStepper(distanceOrSpeed, true); // Assuming true is right
+                // controlStepper(distanceOrSpeed, true); // Assuming true is right
                 break;
         }
         last_time = millis();
     }
 }
+
+
 //------------------------------------STOP ALL MOTORS------------------------------------
 void stopAllMotors() {
     // Stop DC brush motor
     digitalWrite(BRUSH_MOTOR_PIN1, LOW);
     digitalWrite(BRUSH_MOTOR_PIN2, LOW);
-    analogWrite(BRUSH_MOTOR_SPEED_PIN, 0);
 
     // Stop Gearbox motor
     digitalWrite(GEARBOX_MOTOR_PIN1, LOW);
     digitalWrite(GEARBOX_MOTOR_PIN2, LOW);
-    analogWrite(GEARBOX_MOTOR_SPEED_PIN, 0);
-
-    // Stop Stepper motor (stop sending pulses)
-    digitalWrite(STEPPER_STEP_PIN, LOW);
 }

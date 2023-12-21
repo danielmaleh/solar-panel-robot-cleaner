@@ -13,7 +13,7 @@ bool raining = false; // Boolean indicating if it is raining
 bool IRseen = false; // Value of the IR sensor
 unsigned long currentTime; // Actual time
 unsigned long cleaningTime; // Time of the last cleaning
-int stepperStartSpeed = 1000, stepperEndSpeed = 700, stepperAccelerationSteps = 300;
+int stepperStartSpeed = 1300, stepperEndSpeed = 1000, stepperAccelerationSteps = 300;
 const float IR_PERIODE = 1.0; // Periode in milliseconds
 const float RAIN_SENSOR_PERIODE = 1000.0; // Periode in milliseconds
 const int MOTOR_SPEED_BRUSH = 200; // Brush motor speed
@@ -33,10 +33,6 @@ bool lastButtonStateR = HIGH, lastButtonStateC1 = HIGH, lastButtonStateC2 = HIGH
 State currentState = REST; // Initial state
 
 //------------------------------------END GLOBAL DEFINITIONS------------------------------------
-
-void initializeServo() {
-    myServo.attach(SERVO_PIN);  // Attaches the servo on SERVO_PIN to the Servo object
-}
 
 void initializeMotors() {
     // Initialize gearbox motor pins
@@ -67,7 +63,6 @@ void initializeRainSensor() {
 }
 
 void initializeStepperMotor() {
-    pinMode(STEPPER_SLEEP_PIN, OUTPUT);
     pinMode(STEPPER_DIR_PIN, OUTPUT);
     pinMode(STEPPER_STEP_PIN, OUTPUT);
 }
@@ -127,15 +122,14 @@ void controlGearboxMotor(bool direction, int speed) {
 }
 //------------------------------------STEPPER------------------------------------
 void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int stepperEndSpeed, int stepperAccelerationSteps) {
-    // get out of the sleep mode (= enable the step pin to be used) 
     digitalWrite(STEPPER_SLEEP_PIN, HIGH);
-    // necessary wait time of at least 1millisec 
-    delayMicroseconds(2); 
-    digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
+    delayMicroseconds(2);
 
     int totalSteps = distance / CM_PER_REVOLUTION * STEPPER_STEPS_PER_REVOLUTION;
     int stepDelay = stepperStartSpeed;
     int stepChange = (stepperStartSpeed - stepperEndSpeed) / stepperAccelerationSteps;
+
+    digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
 
     // Accelerate
     for (int i = 0; i < stepperAccelerationSteps && i < totalSteps; i++) {
@@ -162,25 +156,31 @@ void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int ste
         delayMicroseconds(stepDelay);
         stepDelay += stepChange;
     }
-    // put into sleep mode (= no power consumption) + disable step pin 
+
     digitalWrite(STEPPER_STEP_PIN, LOW);
     digitalWrite(STEPPER_SLEEP_PIN, LOW);
 }
 
-void control_stepper_bis(int distance, bool clockwise) {
-  digitalWrite(STEPPER_SLEEP_PIN, HIGH);
-  delayMicroseconds(2); 
-  int totalSteps = distance / CM_PER_REVOLUTION * STEPPER_STEPS_PER_REVOLUTION;
-  digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
-  for (int i = 0; i < totalSteps; i++) {
-    digitalWrite(STEPPER_STEP_PIN, HIGH);
-    delayMicroseconds(500);
+void controlStepper(int distance, bool clockwise) {
+    digitalWrite(STEPPER_SLEEP_PIN, HIGH);
+    delayMicroseconds(2);
+
+
+    int totalSteps = distance / CM_PER_REVOLUTION * STEPPER_STEPS_PER_REVOLUTION;
+    digitalWrite(STEPPER_DIR_PIN, clockwise ? HIGH : LOW);
+
+    // Constant speed
+    for (int i = 0; i < totalSteps; i++) {
+        digitalWrite(STEPPER_STEP_PIN, HIGH);
+        delayMicroseconds(stepperEndSpeed);
+        digitalWrite(STEPPER_STEP_PIN, LOW);
+        delayMicroseconds(stepperEndSpeed);
+    }
+
     digitalWrite(STEPPER_STEP_PIN, LOW);
-    delayMicroseconds(500);
-  }
-  digitalWrite(STEPPER_STEP_PIN, LOW);
-  digitalWrite(STEPPER_SLEEP_PIN, LOW);
+    digitalWrite(STEPPER_SLEEP_PIN, LOW);
 }
+
 //------------------------------------LEDs------------------------------------
 void updateLEDs(State currentState) {
     static unsigned long last_time = 0;
@@ -354,7 +354,10 @@ void controlValve(int angle) {
 void rotateServo(int angle) {
     // Convert angle to microseconds
     if (angle >= 0 && angle <= 180) {
-        int pulseWidth = map(angle, 0, 180, 1000, 2000); // Map angle to microseconds
+        // You can adjust these values if your servo has a different range
+        int minPulseWidth = 800;
+        int maxPulseWidth = 2200;
+        int pulseWidth = map(angle, 0, 180, minPulseWidth, maxPulseWidth); // Map angle to microseconds
         myServo.writeMicroseconds(pulseWidth);
         Serial.print("Angle: ");
         Serial.println(angle);
@@ -362,6 +365,7 @@ void rotateServo(int angle) {
         Serial.println("Angle out of range");
     }
 }
+
 //------------------------------------MOTORS MOUVEMENT------------------------------------
 void moveMotor(MotorDirection direction, float distanceOrSpeed) {
     static unsigned long last_time = 0;
@@ -374,12 +378,12 @@ void moveMotor(MotorDirection direction, float distanceOrSpeed) {
                 controlGearboxMotor(false, distanceOrSpeed); // Fixed speed
                 break;
             case LEFT:
-                //controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
-                control_stepper_bis(distanceOrSpeed, false);
+                controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
+                // controlStepper(distanceOrSpeed, false); // Assuming false is left 
                 break;
             case RIGHT:
-                //controlStepper(distanceOrSpeed, true, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming true is right
-                control_stepper_bis(distanceOrSpeed, true); 
+                controlStepper(distanceOrSpeed, true, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming true is right
+                // controlStepper(distanceOrSpeed, true); // Assuming true is right
                 break;
         }
         last_time = millis();
@@ -390,8 +394,13 @@ void stopAllMotors() {
     // Stop DC brush motor
     digitalWrite(BRUSH_MOTOR_PIN1, LOW);
     digitalWrite(BRUSH_MOTOR_PIN2, LOW);
+    //analogWrite(BRUSH_MOTOR_SPEED_PIN, 0);
 
     // Stop Gearbox motor
     digitalWrite(GEARBOX_MOTOR_PIN1, LOW);
     digitalWrite(GEARBOX_MOTOR_PIN2, LOW);
+    //analogWrite(GEARBOX_MOTOR_SPEED_PIN, 0);
+
+    // Stop Stepper motor (stop sending pulses)
+    //digitalWrite(STEPPER_STEP_PIN, LOW);
 }

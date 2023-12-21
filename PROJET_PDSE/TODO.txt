@@ -1,20 +1,16 @@
 // TO DO
 // Add delay for wheel to go down.
-// Add constants or variables: buttonStateC1, buttonStateC2, isRaining, irValue, buttonPin1 etc.
-// change frequency to time
 // Check servo code
-// Remove prints or add them for control and debugging
 // Fix thresholds
 // definr eiither check or force a button state at initialization or resst position.
 // change the brush motor function to have only one direction.
-// implement nb of cycles and counter etc..
+// implement nb of cycles and counter etc.. oe replace by button 2.
 // Re-Grade the stepper motor's steps per rev.
 // connecter les resistances et la LED qui soit visible.
-// fixer l'elec sur la plaque final
-// connecter suivant le schema electronique et le mettre a jour.
+// mettre a jour les 2 schema elec.
 // changer serial begis et initializationcommunication..
-// attention au definitions des pins des boutons.
-// 
+// button c1 and c2 are extremities and r is the old c1 as well.
+// check directions, opening closing.
 // --> GRADE rain sensor
 // --> mettre les capteurs de courant pour le stepper (x2) et pour le gearbox motor (x1) 
 // --> Faire les branchements propres sur la vraie plaquette 

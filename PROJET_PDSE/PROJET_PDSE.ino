@@ -3,10 +3,9 @@
 
 // Setup and initialization
 void setup() {
-    //void initializeSerialCommunication();
     Serial.begin(9600);
-    Serial.println("SETUP8");
-    void initializeServo();
+    Serial.println("SETUP0");
+    myServo.attach(SERVO_PIN);
     Serial.println("SETUP1");
     void initializeMotors();
     Serial.println("SETUP2");
@@ -25,14 +24,18 @@ void setup() {
 // Main loop
 void loop() {
     if (currentState == PROBLEM) {
-        //updateLEDs(currentState);
+        updateLEDs(currentState);
         return;
+    }
+    if (buttonStateC1 == CLICKED && currentState != TRANSLATION) {
+        Serial.println("IF0");
+        currentState = PROBLEM;
     }
     Serial.println("LOOP");
     // Update the current time
     currentTime = millis();
     Serial.println("1");
-    //updateLEDs(currentState);
+    updateLEDs(currentState);
     checkCurrent(CURRENT_PIN1);
     Serial.println("2");
     checkCurrent(CURRENT_PIN2);
@@ -41,7 +44,7 @@ void loop() {
     Serial.println("4");
     checkButtonC1();
     Serial.println("5");
-    checkButtonC2();
+    checkButtonChome();
     Serial.println("6");
     checkIRSensor();
     Serial.println("7");
@@ -51,15 +54,15 @@ void loop() {
         case REST:
             Serial.println("REST");
             checkRainSensor();
-            if (buttonStateR == 0) {
+            if (buttonStateR == CLICKED) {
                 Serial.println("IF1");
                 currentState = PROBLEM;
             }
-            if (IRseen == false || buttonStateC1 == 0 || buttonStateC2 == 1) { // FIX CONDITION
+            if (IRseen == false || buttonStateChome == RELEASED) { 
                 Serial.println("IF2");
                 currentState = RETURN_HOME;
             }
-            else if ((currentTime >= cleaningTime + CLEANING_PERIOD) || (raining && currentTime - cleaningTime > CLEANING_PERIOD / 2)) {
+            else if ((currentTime >= cleaningTime + CLEANING_PERIOD) || raining) {
                 Serial.println("IF3");
                 if (raining) {
                     Serial.println("IF4");
@@ -79,11 +82,11 @@ void loop() {
         case WATER_FILLING:
             Serial.println("WATER_FILLING");
             // If not HOME then RETURN_HOME
-            if (buttonStateR == 0) {
+            if (buttonStateR == CLICKED) {
                 Serial.println("IF7");
                 currentState = PROBLEM;
             }
-            if (IRseen == false || buttonStateC1 == 0 || buttonStateC2 == 1) {
+            if (IRseen == false || buttonStateChome == RELEASED) {
                 Serial.println("IF8");
                 currentState = RETURN_HOME;
             }
@@ -108,9 +111,10 @@ void loop() {
             // Logic to clean the panels
             // If buttonR = 1  state = UP_TRAVEL, both for start and finish. delay for the finish.
             // Else go downward with dc motor and activate dc brush motor and valve (until buttonR=1).
-            if (buttonStateR == 1) {
+            if (buttonStateR == RELEASED) {
                 Serial.println("IF10");
                 delay(END_OF_CLEANING_DELAY);
+                controlValve(VALVE_ANGLE_CLOSE);
                 stopAllMotors();
                 currentState = UP_TRAVEL;
             }
@@ -118,7 +122,7 @@ void loop() {
                 Serial.println("IF11");
                 moveMotor(DOWN, MOTOR_SPEED_GEAR);
                 controlBrushMotor(HIGH, MOTOR_SPEED_BRUSH);
-                controlValve(VALVE_ANGLE);
+                controlValve(VALVE_ANGLE_OPEN);
             }
         break;
         case UP_TRAVEL:
@@ -127,7 +131,7 @@ void loop() {
             // go upward with dc motor until IR sensor detects the robot
             // nb_cycles = nb_cycles + 1
             // if nb of cycles = N state = RETURN_HOME else state = TRANSLATION
-            if (buttonStateR == 0) {
+            if (buttonStateR == CLICKED) {
                 Serial.println("IF12");
                 currentState = PROBLEM;
             }
@@ -151,15 +155,16 @@ void loop() {
             Serial.println("TRANSLATION");
             // Logic to translate to the next position
             // go sidways with stepper motor for step
-            // when stepper motor finished move upwards with dc motor until buttonC1=0 and then state = CLEANING
-            if (buttonStateR == 0) {
+            // when stepper motor finished move upwards with dc motor until buttonR=0 and then state = CLEANING
+            if (buttonStateR == RELEASED) {
                 Serial.println("IF16");
-                currentState = PROBLEM;
-            }
-            else if (buttonStateC1 == 1) {
-                Serial.println("IF17");
                 moveMotor(LEFT, step);
                 moveMotor(UP, MOTOR_SPEED_GEAR);
+            }
+            else if (buttonStateC1 == CLICKED){
+                Serial.println("IF17");
+                stopAllMotors();
+                currentState = RETURN_HOME;
             }
             else {
                 Serial.println("IF18");
@@ -171,8 +176,8 @@ void loop() {
             Serial.println("RETURN_HOME");
             // Logic to return to the initial position
             // if IRseen is false move upward with motor dc until IRseen is true
-            // if buttonC2=1 move sidways with motor stepper until buttonC2=0
-            if (buttonStateR == 0) { // FIX THIS CONDITION WITHOUT PROBLEM STATE
+            // if buttonChome=1 move sidways with motor stepper until buttonChome=0
+            if (buttonStateR == CLICKED) { // FIX THIS CONDITION WITHOUT PROBLEM STATE
                 Serial.println("IF19");
                 currentState = PROBLEM;
             }
@@ -180,7 +185,7 @@ void loop() {
                 Serial.println("IF20");
                 moveMotor(UP, MOTOR_SPEED_GEAR);
             }
-            else if (buttonStateC2 == 1) {
+            else if (buttonStateChome == RELEASED) {
                 Serial.println("IF21");
                 moveMotor(RIGHT, step);
             }
