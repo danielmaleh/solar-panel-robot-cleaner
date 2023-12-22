@@ -1,13 +1,14 @@
 #include <Time.h> 
 #include "def_const_func.h"
 int cont = 0; 
+int ir_thresh = 0; 
 // Setup and initialization
 void setup() {
     //void initializeSerialCommunication();
     Serial.begin(9600);
     Serial.println("SETUP8");
-    myServo.attach(SERVO_PIN);
-    controlValve(180);
+    //myServo.attach(SERVO_PIN);
+    //controlValve(180);
     Serial.println("SETUP1");
     void initializeMotors();
     Serial.println("SETUP2");
@@ -78,7 +79,7 @@ void loop() {
   /* delay(2000); 
   float ir_value = analogRead(IR_SENSOR_PIN);
   Serial.println(ir_value);
-  while (ir_value < 625) {
+  while (ir_value < ir_thresh) {
     moveMotor(UP, MOTOR_SPEED_GEAR);
     ir_value = analogRead(IR_SENSOR_PIN);
   }
@@ -110,24 +111,26 @@ void loop() {
 
   //FINAL DEMO
   delay(2000);
+  stopAllMotors();
   //moveMotor(UP,0); 
-  //delay(3000000); 
-  if (cont == 0) {
-    delay(2000); 
+  //delay(3000000000000); 
+  if (cont == 0) { 
+    calibrate_ir();
     moveMotor(LEFT, 11);
     // 10 rev = 41 cm 
     // 43.5 cm de plateforme a première position 
     stopAllMotors();
-    delay(3000); 
+    delay(1000); 
     float switchr = digitalRead(BUTTON_PIN_R);
     while (switchr == 1) {
       moveMotor(UP,0);
       switchr = digitalRead(BUTTON_PIN_R);
     }
-    delay(2000); 
+    stopAllMotors();
+    delay(1000); 
     moveMotor(DOWN,0);
     controlBrushMotor(true); 
-    controlValve(0);
+    //controlValve(0);
     switchr = digitalRead(BUTTON_PIN_R);
     while (switchr == 0) {
       moveMotor(DOWN,0);
@@ -135,11 +138,14 @@ void loop() {
       switchr = digitalRead(BUTTON_PIN_R);
       Serial.println(switchr);
     }
-    controlValve(180);
-    stopAllMotors();
-    delay(4000); 
+    digitalWrite(BRUSH_MOTOR_PIN1, LOW);
+    digitalWrite(BRUSH_MOTOR_PIN2, LOW);
+    //controlValve(180);
+    delay(200);
+    digitalWrite(GEARBOX_MOTOR_PIN1, LOW);
+    digitalWrite(GEARBOX_MOTOR_PIN2, LOW);
     float ir_value = analogRead(IR_SENSOR_PIN);
-    while (ir_value < 600) {
+    while (ir_value < ir_thresh) {
       moveMotor(UP, 0);
       ir_value = analogRead(IR_SENSOR_PIN);
       Serial.println(ir_value);
@@ -166,10 +172,11 @@ void loop() {
       moveMotor(UP,0);
       switchr = digitalRead(BUTTON_PIN_R);
     }
-    delay(2000); 
+    stopAllMotors();
+    delay(1000); 
     moveMotor(DOWN,0);
     controlBrushMotor(true); 
-    controlValve(0);
+    //controlValve(0);
     switchr = digitalRead(BUTTON_PIN_R);
     while (switchr == 0) {
       moveMotor(DOWN,0);
@@ -177,11 +184,15 @@ void loop() {
       switchr = digitalRead(BUTTON_PIN_R);
       Serial.println(switchr);
     }
-    stopAllMotors();
-    controlValve(180);
-    delay(4000); 
+    digitalWrite(BRUSH_MOTOR_PIN1, LOW);
+    digitalWrite(BRUSH_MOTOR_PIN2, LOW);
+    //controlValve(180);
+    delay(200);
+    digitalWrite(GEARBOX_MOTOR_PIN1, LOW);
+    digitalWrite(GEARBOX_MOTOR_PIN2, LOW);
+    delay(1000); 
     float ir_value = analogRead(IR_SENSOR_PIN);
-    while (ir_value < 600) {
+    while (ir_value < ir_thresh) {
       moveMotor(UP, 0);
       ir_value = analogRead(IR_SENSOR_PIN);
       Serial.println(ir_value);
@@ -204,19 +215,20 @@ void loop() {
     delay(300000000); 
     exit; 
   }
-  delay(2000); 
+  delay(1000); 
   moveMotor(LEFT, 7);
   stopAllMotors();
-  delay(3000); 
+  delay(1000); 
   float switchr = digitalRead(BUTTON_PIN_R);
   while (switchr == 1) {
     moveMotor(UP,0);
     switchr = digitalRead(BUTTON_PIN_R);
   }
-  delay(2000); 
+  stopAllMotors();
+  delay(1000); 
   moveMotor(DOWN,0);
   controlBrushMotor(true);
-  controlValve(0); 
+  //controlValve(0); 
   switchr = digitalRead(BUTTON_PIN_R);
   while (switchr == 0) {
     moveMotor(DOWN,0);
@@ -224,24 +236,61 @@ void loop() {
     switchr = digitalRead(BUTTON_PIN_R);
     Serial.println(switchr);
   }
-  stopAllMotors();
-  controlValve(180);
-  delay(4000); 
+  digitalWrite(BRUSH_MOTOR_PIN1, LOW);
+  digitalWrite(BRUSH_MOTOR_PIN2, LOW);
+  //controlValve(180);
+  delay(200);
+  digitalWrite(GEARBOX_MOTOR_PIN1, LOW);
+  digitalWrite(GEARBOX_MOTOR_PIN2, LOW); 
+  delay(1000); 
   float ir_value = analogRead(IR_SENSOR_PIN);
-  while (ir_value < 600) {
+  while (ir_value < ir_thresh) {
     moveMotor(UP, 0);
     ir_value = analogRead(IR_SENSOR_PIN);
     Serial.println(ir_value);
   }
   stopAllMotors();
   cont = cont + 1; 
-  delay(2000);  
+  delay(1000);  
   //END FINAL DEMO
+
+  //TEST IR ARRET
+  /* delay(2000); 
+  moveMotor(DOWN,0);
+  delay(3000000); 
+  delay(2000); 
+  stopAllMotors();
+  delay(1000); 
+  float ir_value = analogRead(IR_SENSOR_PIN);
+  while (ir_value < 500) {
+    moveMotor(UP, 0);
+    ir_value = analogRead(IR_SENSOR_PIN);
+    Serial.println(ir_value);
+  }
+  stopAllMotors();
+  delay(3000000);  */
+
+
 
   /* delay(3000); 
   controlValve(0); // 0 ouverte
   delay(3000); 
   controlValve(180);// 180 fermée
   delay(3000); */
+  /* calibrate_ir(); 
+  delay(300000);  */
 }
+
+void calibrate_ir () {
+  int mean = 0; 
+  for (int i = 0; i < 10; i++) {
+    float ir_value = analogRead(IR_SENSOR_PIN);
+    Serial.println(ir_value);
+    mean = mean + ir_value; 
+    Serial.println(mean); 
+    delay(500);
+  }
+  ir_thresh = mean/10; 
+  Serial.println(ir_thresh); 
+} 
 

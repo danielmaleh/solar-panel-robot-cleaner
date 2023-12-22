@@ -406,8 +406,4 @@ void stopAllMotors() {
     // Stop Gearbox motor
     digitalWrite(GEARBOX_MOTOR_PIN1, LOW);
     digitalWrite(GEARBOX_MOTOR_PIN2, LOW);
-
-    // Stop Brush motor
-    digitalWrite(BRUSH_MOTOR_PIN1, LOW);
-    digitalWrite(BRUSH_MOTOR_PIN2, LOW);
 }
