@@ -54,9 +54,11 @@ enum ButtonState { CLICKED, RELEASED };
 // 150-160 = at 30cm 
 // 250-280 = at 20cm
 // 460,470 = at 10cm
+// 8cm 560-570
+// comme on veut : entre 615 et 625
 // >600 = < 5cm. Si trop proche la valeur rebaisse.
 
-#define IR_THRESHOLD 600 
+#define IR_THRESHOLD 625 
 #define IR_SENSOR_PIN A4 
 
 extern const float IR_PERIODE;
@@ -79,7 +81,6 @@ extern const float RAIN_SENSOR_PERIODE;
 //------------------------------------DC_GEAR------------------------------------
 #define GEARBOX_MOTOR_PIN1 4
 #define GEARBOX_MOTOR_PIN2 5
-#define GEARBOX_MOTOR_SPEED_PIN 12
 
 extern const int MOTOR_SPEED_GEAR;
 extern const float MOTOR_PERIODE;

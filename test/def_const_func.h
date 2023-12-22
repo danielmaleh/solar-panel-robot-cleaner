@@ -55,7 +55,7 @@ enum ButtonState { CLICKED, RELEASED };
 // 460,470 = at 10cm
 // >600 = < 5cm. Si trop proche la valeur rebaisse.
 
-#define IR_THRESHOLD 600 
+#define IR_THRESHOLD 620 
 #define IR_SENSOR_PIN A4 
 
 extern const float IR_PERIODE;

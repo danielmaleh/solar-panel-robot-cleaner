@@ -113,9 +113,14 @@ void loop() {
             Serial.println("INITIAL_POSITION");
             // Logic to move to the initial position
             // steps to 1st position and when finished state = CLEANING
-            moveMotor(LEFT, DIST_TO_INITIAL_POSITION);
+            moveMotor(RIGHT, DIST_TO_INITIAL_POSITION);
+            stopAllMotors();
+            while (buttonStateR == RELEASED) {
+                moveMotor(UP, MOTOR_SPEED_GEAR);
+            }
             stopAllMotors();
             currentState = CLEANING;
+            delay(3000); 
         break;
         case CLEANING:
             Serial.println("CLEANING");
@@ -195,17 +200,26 @@ void loop() {
                 Serial.println("IF20");
                 moveMotor(UP, MOTOR_SPEED_GEAR);
             }
-            if (IRseen == true) {
-              moveMotor(UP, 200);
-              delay(500); 
+            if (IRseen == true) { 
+              stopAllMotors(); 
+              checkButtonChome();
+              digitalWrite(STEPPER_SLEEP_PIN, HIGH);
+              delayMicroseconds(2);
+              digitalWrite(STEPPER_DIR_PIN, HIGH);
               while (buttonStateChome == RELEASED) {
-                stopAllMotors(); 
                 Serial.println("IF21");
-                moveMotor(LEFT, step);
+                digitalWrite(STEPPER_STEP_PIN, HIGH);
+                delayMicroseconds(1000);
+                digitalWrite(STEPPER_STEP_PIN, LOW);
+                delayMicroseconds(1000);
+                checkButtonChome();
               }
+              digitalWrite(STEPPER_STEP_PIN, LOW);
+              digitalWrite(STEPPER_SLEEP_PIN, LOW);
               Serial.println("IF22");
               stopAllMotors();
               currentState = REST;
+              delay(1000); 
             }
         break;
         case PROBLEM:

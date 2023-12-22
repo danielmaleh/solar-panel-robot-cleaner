@@ -37,7 +37,6 @@ void initializeMotors() {
     // Initialize gearbox motor pins
     pinMode(GEARBOX_MOTOR_PIN1, OUTPUT);
     pinMode(GEARBOX_MOTOR_PIN2, OUTPUT);
-    pinMode(GEARBOX_MOTOR_SPEED_PIN, OUTPUT);
 
     // Initialize brush motor pins
     pinMode(BRUSH_MOTOR_PIN1, OUTPUT);
@@ -112,11 +111,9 @@ void controlBrushMotor(bool direction) {
 
 
 //------------------------------------DC_GEAR------------------------------------
-void controlGearboxMotor(bool direction, int speed) {
+void controlGearboxMotor(bool direction) {
     digitalWrite(GEARBOX_MOTOR_PIN1, direction ? HIGH : LOW);
     digitalWrite(GEARBOX_MOTOR_PIN2, direction ? LOW : HIGH);
-    analogWrite(GEARBOX_MOTOR_SPEED_PIN, speed);
-
 }
 
 
@@ -380,10 +377,10 @@ void moveMotor(MotorDirection direction, float distanceOrSpeed) {
     if (millis() - last_time >= MOTOR_PERIODE) {
         switch (direction) {
             case UP:
-                controlGearboxMotor(true, distanceOrSpeed); // Fixed speed
+                controlGearboxMotor(true); // Fixed speed
                 break;
             case DOWN:
-                controlGearboxMotor(false, distanceOrSpeed); // Fixed speed
+                controlGearboxMotor(false); // Fixed speed
                 break;
             case LEFT:
                 // controlStepper(distanceOrSpeed, false, stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps); // Assuming false is left 
