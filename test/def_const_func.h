@@ -1,145 +1,218 @@
-// def_const_func.h
-// Header file for the main program. "def_const_func" stands for "definitions, constants and functions".
-// Description: 
-// This file contains all the constants and functions used in the main program.
-// The functions are defined in the file 'def_const_func.cpp'.
-// The constants are defined in the file 'def_const_func.h' and are used in the main program.
-// We have the following modules: IR, rain, DC brush, DC gearbox, stepper, LEDs, current, buttons, valve (servo).
-// this file is divided into: Constants, Global variables, Functions.
-// The main program is divided into states. Each state has its own logic.
-// The states are: REST, WATER_FILLING, INITIAL_POSITION, FIRST_POSITION_CLEANING, CLEANING, UP_TRAVEL, TRANSLATION, RETURN_HOME, PROBLEM.
-// The main program is in the file 'main.ino'.
+/**
+ * def_const_func.h - Definitions, Constants, and Function Declarations
+ *
+ * This header file contains all hardware pin definitions, system constants,
+ * and function declarations for the Solar Panel Cleaning Robot.
+ *
+ * Modules:
+ *   - IR Sensor: Position detection
+ *   - Rain Sensor: Weather monitoring
+ *   - DC Brush Motor: Cleaning brush control
+ *   - DC Gearbox Motor: Vertical movement
+ *   - Stepper Motor: Horizontal translation
+ *   - RGB LEDs: Status indication
+ *   - Current Sensors: Motor fault detection
+ *   - Limit Switches: End-of-travel detection
+ *   - Servo Valve: Water dispensing control
+ *
+ * Robot States:
+ *   REST, WATER_FILLING, INITIAL_POSITION, CLEANING,
+ *   UP_TRAVEL, TRANSLATION, RETURN_HOME, PROBLEM
+ */
 
 #ifndef DEF_CONST_FUNC_H
 #define DEF_CONST_FUNC_H
 
-//------------------------------------GENERAL------------------------------------
-#define CLEANING_WIDTH 30 // Effective cleaning width in cm
-#define CLEANING_PERIOD 1000*60 // Time between two cleanings in milliseconds
-#define DIST 100 // Total width of one panel in cm
-#define DIST_TO_INITIAL_POSITION 45 // Distance to the initial position in cm
-#define END_OF_CLEANING_DELAY 2000 // Delay after cleaning in milliseconds, for the wheel to get down
-
-// Global variables
-#ifndef MYSERVO_H
-#define MYSERVO_H
-
 #include <Servo.h>
 
-extern Servo myServo; // Declaration of the Servo object
+// ============================================================================
+// System Configuration Constants
+// ============================================================================
 
-#endif
+#define CLEANING_WIDTH              30      // Effective cleaning width (cm)
+#define CLEANING_PERIOD             60000   // Time between cleanings (ms) - 1 minute
+#define PANEL_WIDTH                 100     // Total width of one panel (cm)
+#define DIST_TO_INITIAL_POSITION    45      // Distance to initial position (cm)
+#define END_OF_CLEANING_DELAY       2000    // Delay after cleaning (ms)
 
-extern int step;
-extern int nb_cycles_counter; // Counter for the number of cycles
-extern bool raining; // Boolean indicating if it is raining
-extern unsigned long currentTime; // Actual time
-extern unsigned long cleaningTime; // Time of the last cleaning
+// ============================================================================
+// Pin Definitions - IR Sensor
+// ============================================================================
 
-// Enumeration for states
-enum State { REST, WATER_FILLING, INITIAL_POSITION, CLEANING, UP_TRAVEL, TRANSLATION, RETURN_HOME, PROBLEM };
-extern State currentState;
+#define IR_SENSOR_PIN               A4
+#define IR_THRESHOLD                620     // Detection threshold value
 
-enum MotorDirection {
-    UP, DOWN, LEFT, RIGHT
+// IR Sensor Reference Values:
+//   < 20:      Nothing detected
+//   150-160:   Object at ~30cm
+//   250-280:   Object at ~20cm
+//   460-470:   Object at ~10cm
+//   > 600:     Object at < 5cm (may decrease if too close)
+
+// ============================================================================
+// Pin Definitions - Rain Sensor
+// ============================================================================
+
+#define RAIN_SENSOR_PIN             A15
+#define RAIN_THRESHOLD              700     // Rain detection threshold
+
+// ============================================================================
+// Pin Definitions - DC Brush Motor
+// ============================================================================
+
+#define BRUSH_MOTOR_PIN1            6
+#define BRUSH_MOTOR_PIN2            7
+
+// ============================================================================
+// Pin Definitions - DC Gearbox Motor
+// ============================================================================
+
+#define GEARBOX_MOTOR_PIN1          4
+#define GEARBOX_MOTOR_PIN2          5
+#define GEARBOX_MOTOR_SPEED_PIN     12
+
+// ============================================================================
+// Pin Definitions - Stepper Motor
+// ============================================================================
+
+#define STEPPER_DIR_PIN             2
+#define STEPPER_STEP_PIN            3
+#define STEPPER_SLEEP_PIN           28
+#define STEPPER_STEPS_PER_REV       200     // Steps per revolution
+#define CM_PER_REVOLUTION           2.0     // Distance per revolution (cm)
+
+// ============================================================================
+// Pin Definitions - RGB LED
+// ============================================================================
+
+#define RED_LED_PIN                 11
+#define GREEN_LED_PIN               9
+#define BLUE_LED_PIN                8
+#define LED_INTENSITY               150     // PWM intensity (0-255)
+
+// ============================================================================
+// Pin Definitions - Current Sensors
+// ============================================================================
+
+#define CURRENT_PIN_GEARBOX         A14     // Current sensor for gearbox motor
+#define CURRENT_PIN_BRUSH           A0      // Current sensor for brush motor
+#define CURRENT_SENSITIVITY         0.185   // ACS712 sensitivity (V/A)
+#define CURRENT_THRESHOLD_GEARBOX   1.5     // Fault threshold (A)
+#define CURRENT_THRESHOLD_BRUSH     0.7     // Fault threshold (A)
+
+// Alias for backwards compatibility
+#define CURRENT_PIN1                CURRENT_PIN_GEARBOX
+#define CURRENT_PIN2                CURRENT_PIN_BRUSH
+
+// ============================================================================
+// Pin Definitions - Limit Switches (Buttons)
+// ============================================================================
+
+#define BUTTON_PIN_R                22      // End-of-travel on robot
+#define BUTTON_PIN_C1               24      // End-of-travel on carriage
+#define BUTTON_PIN_Chome            26      // End-of-travel at home station
+#define DEBOUNCE_DELAY              50      // Button debounce delay (ms)
+
+// ============================================================================
+// Pin Definitions - Servo Valve
+// ============================================================================
+
+#define SERVO_PIN                   13
+#define VALVE_ANGLE_OPEN            180     // Valve open position (degrees)
+#define VALVE_ANGLE_CLOSE           0       // Valve closed position (degrees)
+
+// ============================================================================
+// Enumerations
+// ============================================================================
+
+/**
+ * Robot operating states
+ */
+enum State {
+    REST,               // Idle, waiting for trigger
+    WATER_FILLING,      // Filling water reservoir
+    INITIAL_POSITION,   // Moving to start position
+    CLEANING,           // Active cleaning in progress
+    UP_TRAVEL,          // Returning to top of panel
+    TRANSLATION,        // Horizontal movement
+    RETURN_HOME,        // Returning to docking station
+    PROBLEM             // Error state - all motors stopped
 };
 
-enum ButtonState { CLICKED, RELEASED };
+/**
+ * Motor movement directions
+ */
+enum MotorDirection {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+};
 
+/**
+ * Button states
+ */
+enum ButtonState {
+    CLICKED,
+    RELEASED
+};
 
-//------------------------------------IR------------------------------------
-// GRADING:
-// < 20 : nothing 
-// 150-160 = at 30cm 
-// 250-280 = at 20cm
-// 460,470 = at 10cm
-// >600 = < 5cm. Si trop proche la valeur rebaisse.
+// ============================================================================
+// Global Variable Declarations
+// ============================================================================
 
-#define IR_THRESHOLD 620 
-#define IR_SENSOR_PIN A4 
+// Servo object
+extern Servo myServo;
 
+// System state
+extern State currentState;
+extern int step;
+extern int nb_cycles_counter;
+extern bool raining;
+extern unsigned long currentTime;
+extern unsigned long cleaningTime;
+
+// IR sensor
 extern const float IR_PERIODE;
 extern bool IRseen;
 
-
-//------------------------------------RAIN------------------------------------
-#define RAIN_THRESHOLD 700 // DEFINED
-#define RAIN_SENSOR_PIN A15  
-
-// Frequency of the rain detector
+// Rain sensor
 extern const float RAIN_SENSOR_PERIODE;
 
-
-//------------------------------------DC_BRUSH------------------------------------
-#define BRUSH_MOTOR_PIN1 6
-#define BRUSH_MOTOR_PIN2 7
-
-
-//------------------------------------DC_GEAR------------------------------------
-#define GEARBOX_MOTOR_PIN1 4
-#define GEARBOX_MOTOR_PIN2 5
-#define GEARBOX_MOTOR_SPEED_PIN 12
-
+// Motors
 extern const int MOTOR_SPEED_GEAR;
 extern const float MOTOR_PERIODE;
 
+// Stepper configuration
+extern int stepperStartSpeed;
+extern int stepperEndSpeed;
+extern int stepperAccelerationSteps;
 
-//------------------------------------STEPPER------------------------------------
-// GRADING:
-// 20cm in 5 rev. = 4 cm per rev.
-#define CM_PER_REVOLUTION 2.0 // 4 cm per revolution
-#define STEPPER_STEPS_PER_REVOLUTION 200 //remove??
-
-#define STEPPER_DIR_PIN 2
-#define STEPPER_STEP_PIN 3
-#define STEPPER_SLEEP_PIN 28
-extern int stepperStartSpeed, stepperEndSpeed, stepperAccelerationSteps;
-
-
-//------------------------------------LEDs------------------------------------
-#define LED_INTENSITY 150 
-#define RED_LED_PIN 11
-#define GREEN_LED_PIN 9
-#define BLUE_LED_PIN 8
-
+// LEDs
 extern const float LED_PERIODE;
 
-
-//------------------------------------CURRENT------------------------------------
-#define CURRENT_SENSITIVITY 0.185 // DEFINED
-#define CURRENT_THRESHOLD_GEARBOX 1.5 // DEFINED
-#define CURRENT_THRESHOLD_BRUSH 0.7 
-#define CURRENT_PIN1 A14 // current sensor for gearbox motor
-#define CURRENT_PIN2 A0 // current sensor for brush motor
-
+// Current sensors
 extern const float CURRENT_PERIODE;
 
-
-//------------------------------------BUTTONS------------------------------------
-#define DEBOUNCE_DELAY 50 // Debounce delay in milliseconds
-
-#define BUTTON_PIN_R 22 // End of travel button on robot 3
-#define BUTTON_PIN_C1 24 // End of travel button on carrige 2
-#define BUTTON_PIN_Chome 26 // End of travel button on resting station 1
-
-// Debouncing Variables
-extern unsigned long lastDebounceTimeR, lastDebounceTimeC1, lastDebounceTimeChome;
-extern bool lastButtonStateR, lastButtonStateC1, lastButtonStateChome;
-
-extern bool buttonStateR, buttonStateC1, buttonStateChome;
-
+// Buttons - debouncing
 extern const float BUTTON_PERIODE;
+extern unsigned long lastDebounceTimeR;
+extern unsigned long lastDebounceTimeC1;
+extern unsigned long lastDebounceTimeChome;
+extern bool lastButtonStateR;
+extern bool lastButtonStateC1;
+extern bool lastButtonStateChome;
+extern bool buttonStateR;
+extern bool buttonStateC1;
+extern bool buttonStateChome;
 
-
-//------------------------------------VALVE (SERVO)------------------------------------
-#define SERVO_PIN 13 
-#define VALVE_ANGLE_OPEN 180 // Angle of the valve in degrees open
-#define VALVE_ANGLE_CLOSE 0 // Angle of the valve in degrees closed
+// Valve
 extern const float VALVE_PERIODE;
 
+// ============================================================================
+// Function Declarations - Initialization
+// ============================================================================
 
-//====================================FUNCTION DECLARATIONS====================================
-// Initialization functions
 void initializeMotors();
 void initializeButtons();
 void initializeLEDPins();
@@ -147,25 +220,28 @@ void initializeRainSensor();
 void initializeStepperMotor();
 void initializeCurrentSensors();
 
+// ============================================================================
+// Function Declarations - Sensors
+// ============================================================================
 
-// State functions
-//------------------------------------IR------------------------------------
 void checkIRSensor();
-
-//------------------------------------RAIN------------------------------------
 void checkRainSensor();
 
-//------------------------------------DC_BRUSH------------------------------------
+// ============================================================================
+// Function Declarations - Motor Control
+// ============================================================================
+
 void controlBrushMotor(bool direction);
-
-//------------------------------------DC_GEAR------------------------------------
-void controlGearboxMotor(bool direction, int speed);
-
-//------------------------------------STEPPER------------------------------------
-void controlStepper(int distance, bool clockwise, int stepperStartSpeed, int stepperEndSpeed, int stepperAccelerationSteps);
+void controlGearboxMotor(bool direction);
+void controlStepper(int distance, bool clockwise, int startSpeed, int endSpeed, int accelSteps);
 void controlStepper(int distance, bool clockwise);
+void moveMotor(MotorDirection direction, float distanceOrSpeed);
+void stopAllMotors();
 
-//------------------------------------LEDs------------------------------------
+// ============================================================================
+// Function Declarations - LED Status
+// ============================================================================
+
 void updateLEDs(State currentState);
 void redLED(bool flashing);
 void greenLED(bool flashing);
@@ -174,24 +250,20 @@ void whiteLED(bool flashing);
 void setColor(int red, int green, int blue, bool flashing);
 void writeColor(int red, int green, int blue);
 
-//------------------------------------CURRENT------------------------------------
-void checkCurrent(int currentPin);
+// ============================================================================
+// Function Declarations - Safety & Monitoring
+// ============================================================================
 
-//------------------------------------BUTTONS------------------------------------
+void checkCurrent(int currentPin);
 void checkButtonR();
 void checkButtonC1();
 void checkButtonChome();
 
-//------------------------------------VALVE (Servo)------------------------------------
+// ============================================================================
+// Function Declarations - Valve Control
+// ============================================================================
+
 void controlValve(int angle);
 void rotateServo(int angle);
-
-
-//------------------------------------MOTORS MOUVEMENT------------------------------------
-void moveMotor(MotorDirection direction, float distanceOrSpeed);
-
-
-//------------------------------------STOP ALL MOTORS------------------------------------
-void stopAllMotors();
 
 #endif // DEF_CONST_FUNC_H
